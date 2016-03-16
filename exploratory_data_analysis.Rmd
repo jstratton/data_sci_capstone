@@ -1,0 +1,34 @@
+---
+title: "Exploratory Data Analysis"
+author: "J. Stratton"
+date: "March 16, 2016"
+output: html_document
+---
+
+```{r, echo=TRUE}
+library(tm)
+library(SnowballC)
+```
+
+```{r, echo=TRUE}
+docs <- DirSource(directory = paste0(getwd(), "/final/en_US"))
+
+texts <- VCorpus(docs)
+
+texts <- tm_map(texts, stripWhitespace)
+
+texts <- tm_map(texts, content_transformer(tolower))
+
+texts <- tm_map(texts, removeWords, stopwords("english"))
+
+texts <- tm_map(texts, stemDocument)
+
+cdf <- function(n){
+        output <- numeric(n)
+        output[1] <- freq[1]
+        for(i in 2:n){
+                output[i] <- freq[i] + output[i - 1]
+        }
+        
+        100*output/numwords}
+```
