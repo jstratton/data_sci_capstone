@@ -55,18 +55,23 @@ docs <- DirSource(directory = paste0(getwd(),"/final/en_US"), encoding = "UTF-8"
 
 texts <- VCorpus(docs)
 
-# Use a random representative 20% sample from the corpus
+line_count <- sapply(X = texts, FUN = function(x){length(x[[1]])})
+
+# Use a random representative 5% sample from the corpus
+pcnt <- 5
 set.seed(3202016)
 
-texts[[1]][[1]] <- texts[[1]][[1]][as.logical(rbinom(n = line_count[1], size = 1, prob = .20))]
-texts[[2]][[1]] <- texts[[2]][[1]][as.logical(rbinom(n = line_count[2], size = 1, prob = .20))]
-texts[[3]][[1]] <- texts[[3]][[1]][as.logical(rbinom(n = line_count[3], size = 1, prob = .20))]
+texts[[1]][[1]] <- sample(x = texts[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+texts[[2]][[1]] <- sample(x = texts[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+texts[[3]][[1]] <- sample(x = texts[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
 
 # Remove whitespace
 texts <- tm_map(texts, stripWhitespace)
 
 # Remove the rarely used low info characters from the corpus
 texts <- tm_map(texts, content_transformer(gsub), pattern = "[^ [[:alpha:]]", replacement = "")
+
+texts <- tm_map(texts, content_transformer(tolower))
 
 # Remove swear words
 swears <- c("bastard", "bitch", "cunt", "damn", "fuck", "hell", "shit", "ass", "shitass")
@@ -107,6 +112,9 @@ texts <- tm_map(texts, content_transformer(rm_web_addresses))
 
 # Remove stop words
 texts <- tm_map(texts, removeWords, stopwords("english"))
+
+# Remove any whitespace my cleaning regexes created
+texts <- tm_map(texts, stripWhitespace)
 ```
 
 ```{r, echo=FALSE}
