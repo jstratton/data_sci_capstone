@@ -2,7 +2,7 @@
 title: "Exploratory Data Analysis"
 author: "J. Stratton"
 date: "March 16, 2016"
-output: pdf
+output: html_document
 ---
 
 ```{r load_libs, echo=FALSE, message=FALSE, warning=FALSE}
