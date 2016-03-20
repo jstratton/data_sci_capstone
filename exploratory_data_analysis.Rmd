@@ -26,8 +26,29 @@ texts <- tm_map(texts, content_transformer(tolower))
 ```
 
 ```{r analyze_raw_txt, echo=FALSE}
-word_count <- sapply(X = texts, FUN = )
+
 line_count <- sapply(X = texts, FUN = function(x){length(x[[1]])})
+
+chars_per_line <- lapply(X = texts, FUN = function(x){nchar(x[[1]])})
+
+words_per_line <- lapply(X = texts, FUN = function(x){
+        sapply(X = strsplit(x[[1]], split = "[[:space:]]+"), FUN = length)
+})
+```
+
+```{r output_raw_counts, echo=TRUE}
+line_count_output <- data.frame(line_count, row.names = c("Blogs", "News", "Twitter"))
+colnames(line_count_output) <- "Number of Lines"
+line_count_output
+
+chars_per_line_output <- sapply(X = chars_per_line, FUN = summary)
+words_per_line_output <- sapply(X = words_per_line, FUN = summary)
+
+colnames(chars_per_line_output) <- c("Blogs", "News", "Twitter")
+colnames(words_per_line_output) <- c("Blogs", "News", "Twitter")
+
+chars_per_line_output
+words_per_line_output
 ```
 
 ```{r, echo=FALSE}
