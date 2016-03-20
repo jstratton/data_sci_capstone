@@ -11,7 +11,7 @@ library(RWeka)
 library(SnowballC)
 ```
 
-```{r exploring_txts, echo=FALSE}
+```{r exploring_txts, echo=FALSE, cache=TRUE}
 # Load full files
 docs <- DirSource(directory = paste0(getwd(),"/final/en_US"), encoding = "UTF-8")
 
@@ -23,7 +23,7 @@ texts <- tm_map(texts, content_transformer(gsub), pattern = "[^ [[:alpha:]]", re
 
 ```
 
-```{r analyze_raw_txt, echo=FALSE}
+```{r analyze_raw_txt, echo=FALSE, cache=TRUE}
 
 line_count <- sapply(X = texts, FUN = function(x){length(x[[1]])})
 
@@ -49,21 +49,12 @@ chars_per_line_output
 words_per_line_output
 ```
 
-```{r create_clean_corpus, echo=FALSE}
+```{r create_clean_corpuses, echo=FALSE, cache=TRUE}
+# Clean the text in the corpus
 
 docs <- DirSource(directory = paste0(getwd(),"/final/en_US"), encoding = "UTF-8")
 
 texts <- VCorpus(docs)
-
-line_count <- sapply(X = texts, FUN = function(x){length(x[[1]])})
-
-# Use a random representative 5% sample from the corpus
-pcnt <- 5
-set.seed(3202016)
-
-texts[[1]][[1]] <- sample(x = texts[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
-texts[[2]][[1]] <- sample(x = texts[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
-texts[[3]][[1]] <- sample(x = texts[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
 
 # Remove whitespace
 texts <- tm_map(texts, stripWhitespace)
@@ -117,7 +108,107 @@ texts <- tm_map(texts, removeWords, stopwords("english"))
 texts <- tm_map(texts, stripWhitespace)
 ```
 
-```{r, echo=FALSE}
+```{r create_random_samples, echo=FALSE, cache=TRUE}
+line_count <- sapply(X = texts, FUN = function(x){length(x[[1]])})
+
+# Use a random 5% sample from the corpus for each sample
+pcnt <- 5
+set.seed(3202016)
+
+# Make sample 1
+sample_text_1 <- texts
+
+sample_text_1[[1]][[1]] <- sample(x = sample_text_1[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+sample_text_1[[2]][[1]] <- sample(x = sample_text_1[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+sample_text_1[[3]][[1]] <- sample(x = sample_text_1[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
+
+# Make sample 2
+sample_text_2 <- texts
+
+sample_text_2[[1]][[1]] <- sample(x = sample_text_2[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+
+sample_text_2[[2]][[1]] <- sample(x = sample_text_2[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+
+sample_text_2[[3]][[1]] <- sample(x = sample_text_2[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
+
+# Make sample 3
+sample_text_3 <- texts
+
+sample_text_3[[1]][[1]] <- sample(x = sample_text_3[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+
+sample_text_3[[2]][[1]] <- sample(x = sample_text_3[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+
+sample_text_3[[3]][[1]] <- sample(x = sample_text_3[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
+
+# Make sample 4
+sample_text_4 <- texts
+
+sample_text_4[[1]][[1]] <- sample(x = sample_text_4[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+
+sample_text_4[[2]][[1]] <- sample(x = sample_text_4[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+
+sample_text_4[[3]][[1]] <- sample(x = sample_text_4[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
+
+# Make sample 5
+sample_text_5 <- texts
+
+sample_text_5[[1]][[1]] <- sample(x = sample_text_5[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+
+sample_text_5[[2]][[1]] <- sample(x = sample_text_5[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+
+sample_text_5[[3]][[1]] <- sample(x = sample_text_5[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
+
+```
+
+```{r analyze_rand_samples, echo=FALSE, cache=TRUE}
+# Analyze 1-grams
+strsplit_space_tokenizer <- function(x)
+    unlist(strsplit(as.character(x), "[[:space:]]+"))
+
+ctrl <- list(tokenize = strsplit_space_tokenizer, tolower = FALSE)
+
+freq_1 <- lapply(X = sample_text_1, FUN = termFreq, control = ctrl)
+freq_2 <- lapply(X = sample_text_2, FUN = termFreq, control = ctrl)
+freq_3 <- lapply(X = sample_text_3, FUN = termFreq, control = ctrl)
+freq_4 <- lapply(X = sample_text_4, FUN = termFreq, control = ctrl)
+freq_5 <- lapply(X = sample_text_5, FUN = termFreq, control = ctrl)
+
+# Analyze 2- through 4-grams
+bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 4))}
+
+ctrl <- list(tokenize = bigramtokenizer, tolower = FALSE)
+
+
+n_gram_freq_1 <- lapply(X = sample_text_1, FUN = termFreq, control = ctrl)
+n_gram_freq_2 <- lapply(X = sample_text_2, FUN = termFreq, control = ctrl)
+n_gram_freq_3 <- lapply(X = sample_text_3, FUN = termFreq, control = ctrl)
+n_gram_freq_4 <- lapply(X = sample_text_4, FUN = termFreq, control = ctrl)
+n_gram_freq_5 <- lapply(X = sample_text_5, FUN = termFreq, control = ctrl)
+
+# Sort the frequency lists
+freq_1 <- lapply(X = freq_1, FUN = sort, decreasing = TRUE)
+freq_2 <- lapply(X = freq_2, FUN = sort, decreasing = TRUE)
+freq_3 <- lapply(X = freq_3, FUN = sort, decreasing = TRUE)
+freq_4 <- lapply(X = freq_4, FUN = sort, decreasing = TRUE)
+freq_5 <- lapply(X = freq_5, FUN = sort, decreasing = TRUE)
+
+n_gram_freq_1 <- lapply(X = n_gram_freq_1, FUN = sort, decreasing = TRUE)
+n_gram_freq_2 <- lapply(X = n_gram_freq_2, FUN = sort, decreasing = TRUE)
+n_gram_freq_3 <- lapply(X = n_gram_freq_3, FUN = sort, decreasing = TRUE)
+n_gram_freq_4 <- lapply(X = n_gram_freq_4, FUN = sort, decreasing = TRUE)
+n_gram_freq_5 <- lapply(X = n_gram_freq_5, FUN = sort, decreasing = TRUE)
+```
+
+```{r form_tdms, echo=FALSE, cache=TRUE}
+# Maker term document matrices for all 5 samples
+tdm_1 <- TermDocumentMatrix(sample_text_1)
+tdm_2 <- TermDocumentMatrix(sample_text_2)
+tdm_3 <- TermDocumentMatrix(sample_text_3)
+tdm_4 <- TermDocumentMatrix(sample_text_4)
+tdm_5 <- TermDocumentMatrix(sample_text_5)
+```
+
+```{r, echo=FALSE, eval=FALSE}
 #Load sample files
 docs <- DirSource(directory = paste0(getwd(), "/samples/clean"), encoding = "UTF-8")
 
@@ -152,7 +243,7 @@ cdf <- function(n){
         100*output/numwords}
 ```
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, eval=FALSE}
 # Create sample files
 dir <- paste0(getwd(),"/final/en_US")
 twit <- readLines(con = paste0(dir, "/en_US.twitter.txt"), encoding = "UTF-8")
@@ -168,7 +259,7 @@ writeLines(text = blogs[as.logical(rbinom(n = length(blogs), size = 1, prob = .0
 writeLines(text = news[as.logical(rbinom(n = length(news), size = 1, prob = .05))], con = paste0(getwd(), "/samples/news.txt"))
 ```
 
-```{r cleaning_data, echo=TRUE}
+```{r cleaning_data, echo=TRUE, eval=FALSE}
 # I needed to remove the webadresses in preprocessing, because tm apparently doesn't like regex's.
 # regex's are also a lot more elegant for eliminating swear words
 
@@ -219,7 +310,7 @@ writeLines(text = blogs, con = paste0(getwd(), "/samples/clean/blogs.txt"))
 writeLines(text = news, con = paste0(getwd(), "/samples/clean/news.txt"))
 ```
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, eval=FALSE}
 #Assess 1-grams
 strsplit_space_tokenizer <- function(x)
     unlist(strsplit(as.character(x), "[[:space:]]+"))
@@ -239,7 +330,7 @@ freq <- lapply(X = freq, FUN = sort, decreasing = TRUE)
 #plot(x = 1:10, y = cdf(10))
 ```
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, eval=FALSE}
 bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 4))}
 
 ctrl <- list(tokenize = bigramtokenizer, tolower = FALSE)
@@ -257,7 +348,7 @@ freq <- lapply(X = freq, FUN = sort, decreasing = TRUE)
 #plot(x = 1:10, y = cdf(10))
 ```
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, eval=FALSE}
 #Term-Document Matrix
 tdm <- TermDocumentMatrix(texts)
 ```
