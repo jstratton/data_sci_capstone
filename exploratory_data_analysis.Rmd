@@ -21,8 +21,6 @@ texts <- tm_map(texts, stripWhitespace)
 
 texts <- tm_map(texts, content_transformer(gsub), pattern = "[^ [[:alpha:]]", replacement = "")
 
-texts <- tm_map(texts, content_transformer(tolower))
-
 ```
 
 ```{r analyze_raw_txt, echo=FALSE}
@@ -36,7 +34,7 @@ words_per_line <- lapply(X = texts, FUN = function(x){
 })
 ```
 
-```{r output_raw_counts, echo=TRUE}
+```{r output_raw_counts, echo=FALSE}
 line_count_output <- data.frame(line_count, row.names = c("Blogs", "News", "Twitter"))
 colnames(line_count_output) <- "Number of Lines"
 line_count_output
@@ -49,6 +47,66 @@ colnames(words_per_line_output) <- c("Blogs", "News", "Twitter")
 
 chars_per_line_output
 words_per_line_output
+```
+
+```{r create_clean_corpus, echo=FALSE}
+
+docs <- DirSource(directory = paste0(getwd(),"/final/en_US"), encoding = "UTF-8")
+
+texts <- VCorpus(docs)
+
+# Use a random representative 20% sample from the corpus
+set.seed(3202016)
+
+texts[[1]][[1]] <- texts[[1]][[1]][as.logical(rbinom(n = line_count[1], size = 1, prob = .20))]
+texts[[2]][[1]] <- texts[[2]][[1]][as.logical(rbinom(n = line_count[2], size = 1, prob = .20))]
+texts[[3]][[1]] <- texts[[3]][[1]][as.logical(rbinom(n = line_count[3], size = 1, prob = .20))]
+
+# Remove whitespace
+texts <- tm_map(texts, stripWhitespace)
+
+# Remove the rarely used low info characters from the corpus
+texts <- tm_map(texts, content_transformer(gsub), pattern = "[^ [[:alpha:]]", replacement = "")
+
+# Remove swear words
+swears <- c("bastard", "bitch", "cunt", "damn", "fuck", "hell", "shit", "ass", "shitass")
+
+texts <- tm_map(texts, removeWords, swears)
+
+# Remove swear words part II
+rm_complex_swear_words <- function(x){
+        # Swear words taken from https://en.wiktionary.org/wiki/Category:English_swear_words
+        
+        # Ass can't be removed easily because too many legitimate words have this word but asshole can be removed
+        x <- gsub(pattern = "ass[:space:]*hole", replacement = "", x = x, ignore.case = TRUE)
+        
+        x <- gsub(pattern = "god.*?damn", replacement = "", x = x, ignore.case = TRUE)
+        
+        #Taking out the word shit will get rid of "holy shit"
+        
+        x <- gsub(pattern = "son of a whore", replacement = "", x = x, ignore.case = TRUE)
+        
+        x <- gsub(pattern = "mother.*?fucker", replacement = "", x = x, ignore.case = TRUE)
+        
+        x
+}
+
+texts <- tm_map(texts, content_transformer(rm_complex_swear_words))
+
+# Remove webaddresses
+rm_web_addresses <- function(x){
+        x <- gsub(pattern = "(http|w{3}).*?(com|edu|org| )", replacement = "", x = x, ignore.case = TRUE)
+        
+        # Get webadresses that appear at the end of a line.
+        x <- gsub(pattern = "((http|w{3}).*?(com|edu|org|)*)$", replacement = "", x = x, ignore.case = TRUE)
+        
+        x
+}
+
+texts <- tm_map(texts, content_transformer(rm_web_addresses))
+
+# Remove stop words
+texts <- tm_map(texts, removeWords, stopwords("english"))
 ```
 
 ```{r, echo=FALSE}
