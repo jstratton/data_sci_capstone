@@ -71,7 +71,14 @@ twit <- readLines(con = paste0(dir, "/twit.txt"), encoding = "UTF-8")
 blogs <- readLines(con = paste0(dir, "/blogs.txt"), encoding = "UTF-8")
 news <- readLines(con = paste0(dir, "/news.txt"), encoding = "UTF-8")
 
-rm_web_addresses <- function(x){gsub(pattern = "(http|w{3}).*?(com|edu|org| )", replacement = "", x = x, ignore.case = TRUE)}
+rm_web_addresses <- function(x){
+        x <- gsub(pattern = "(http|w{3}).*?(com|edu|org| )", replacement = "", x = x, ignore.case = TRUE)
+        
+        # Get webadresses that appear at the end of a line.
+        x <- gsub(pattern = "((http|w{3}).*?(com|edu|org|)*)$", replacement = "", x = x, ignore.case = TRUE)
+        
+        x
+}
 
 twit <- rm_web_addresses(twit)
 blogs <- rm_web_addresses(blogs)
@@ -113,13 +120,17 @@ strsplit_space_tokenizer <- function(x)
 
 ctrl <- list(tokenize = strsplit_space_tokenizer, tolower = FALSE)
 
-freq <- termFreq(doc = texts[[3]], control = ctrl)
+freq <- lapply(X = texts, FUN = termFreq, control = ctrl)
 
-freq <- sort(x = freq, decreasing = TRUE)
+#freq <- termFreq(doc = texts[[3]], control = ctrl)
 
-numwords <- sum(freq)
+# freq <- sort(x = freq, decreasing = TRUE)
 
-plot(x = 1:10, y = cdf(10))
+freq <- lapply(X = freq, FUN = sort, decreasing = TRUE)
+
+#numwords <- sum(freq)
+
+#plot(x = 1:10, y = cdf(10))
 ```
 
 ```{r, echo=TRUE}
@@ -127,13 +138,17 @@ bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 4))
 
 ctrl <- list(tokenize = bigramtokenizer, tolower = FALSE)
 
-freq <- termFreq(doc = texts[[3]], control = ctrl)
+freq <- lapply(X = texts, FUN = termFreq, control = ctrl)
 
-freq <- sort(x = freq, decreasing = TRUE)
+# termFreq(doc = texts[[3]], control = ctrl)
 
-numwords <- sum(freq)
+# freq <- sort(x = freq, decreasing = TRUE)
 
-plot(x = 1:10, y = cdf(10))
+freq <- lapply(X = freq, FUN = sort, decreasing = TRUE)
+
+#numwords <- sum(freq)
+
+#plot(x = 1:10, y = cdf(10))
 ```
 
 ```{r, echo=TRUE}
