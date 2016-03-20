@@ -2,18 +2,37 @@
 title: "Exploratory Data Analysis"
 author: "J. Stratton"
 date: "March 16, 2016"
-output: html_document
+output: pdf
 ---
 
-```{r, echo=TRUE}
+```{r load_libs, echo=FALSE, message=FALSE, warning=FALSE}
 library(tm)
 library(RWeka)
 library(SnowballC)
 ```
 
-```{r, echo=TRUE}
+```{r exploring_txts, echo=FALSE}
+# Load full files
+docs <- DirSource(directory = paste0(getwd(),"/final/en_US"), encoding = "UTF-8")
+
+texts <- VCorpus(docs)
+
+texts <- tm_map(texts, stripWhitespace)
+
+texts <- tm_map(texts, content_transformer(gsub), pattern = "[^ [[:alpha:]]", replacement = "")
+
+texts <- tm_map(texts, content_transformer(tolower))
+
+```
+
+```{r analyze_raw_txt, echo=FALSE}
+word_count <- sapply(X = texts, FUN = )
+line_count <- sapply(X = texts, FUN = function(x){length(x[[1]])})
+```
+
+```{r, echo=FALSE}
 #Load sample files
-docs <- DirSource(directory = paste0(getwd(), "/samples"), encoding = "UTF-8")
+docs <- DirSource(directory = paste0(getwd(), "/samples/clean"), encoding = "UTF-8")
 
 texts <- VCorpus(docs)
 
@@ -34,7 +53,7 @@ texts <- tm_map(texts, removePunctuation)
 
 texts <- tm_map(texts, removeWords, stopwords("english"))
 
-texts <- tm_map(texts, stemDocument)
+#texts <- tm_map(texts, stemDocument)
 
 cdf <- function(n){
         output <- numeric(n)
