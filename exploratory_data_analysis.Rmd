@@ -208,6 +208,24 @@ tdm_4 <- TermDocumentMatrix(sample_text_4)
 tdm_5 <- TermDocumentMatrix(sample_text_5)
 ```
 
+```{r freq_term_tables, echo=FALSE}
+blog_monograms_table <- cbind(1:10, rownames(freq_1[[1]][1:10]), freq_1[[1]][1:10], rownames(freq_2[[1]][1:10]), freq_2[[1]][1:10], rownames(freq_3[[1]][1:10]), freq_3[[1]][1:10], rownames(freq_4[[1]][1:10]), freq_4[[1]][1:10], rownames(freq_5[[1]][1:10]), freq_5[[1]][1:10])
+
+news_monograms_table <- cbind(1:10, rownames(freq_1[[2]][1:10]), freq_1[[2]][1:10], rownames(freq_2[[2]][1:10]), freq_2[[2]][1:10], rownames(freq_3[[2]][1:10]), freq_3[[2]][1:10], rownames(freq_4[[2]][1:10]), freq_4[[2]][1:10], rownames(freq_5[[2]][1:10]), freq_5[[2]][1:10])
+
+twit_monograms_table <- cbind(1:10, rownames(freq_1[[3]][1:10]), freq_1[[3]][1:10], rownames(freq_2[[3]][1:10]), freq_2[[3]][1:10], rownames(freq_3[[3]][1:10]), freq_3[[3]][1:10], rownames(freq_4[[3]][1:10]), freq_4[[3]][1:10], rownames(freq_5[[3]][1:10]), freq_5[[3]][1:10])
+
+rownames(blog_monograms_table) <- rep(x = "", times = 10)
+blog_monograms_table
+
+rownames(news_monograms_table) <- rep(x = "", times = 10)
+news_monograms_table
+
+rownames(twit_monograms_table) <- rep(x = "", times = 10)
+twit_monograms_table
+
+```
+
 ```{r, echo=FALSE, eval=FALSE}
 #Load sample files
 docs <- DirSource(directory = paste0(getwd(), "/samples/clean"), encoding = "UTF-8")
@@ -243,7 +261,7 @@ cdf <- function(n){
         100*output/numwords}
 ```
 
-```{r, echo=TRUE, eval=FALSE}
+```{r, echo=FALSE, eval=FALSE}
 # Create sample files
 dir <- paste0(getwd(),"/final/en_US")
 twit <- readLines(con = paste0(dir, "/en_US.twitter.txt"), encoding = "UTF-8")
@@ -259,7 +277,7 @@ writeLines(text = blogs[as.logical(rbinom(n = length(blogs), size = 1, prob = .0
 writeLines(text = news[as.logical(rbinom(n = length(news), size = 1, prob = .05))], con = paste0(getwd(), "/samples/news.txt"))
 ```
 
-```{r cleaning_data, echo=TRUE, eval=FALSE}
+```{r cleaning_data, echo=FALSE, eval=FALSE}
 # I needed to remove the webadresses in preprocessing, because tm apparently doesn't like regex's.
 # regex's are also a lot more elegant for eliminating swear words
 
@@ -310,7 +328,7 @@ writeLines(text = blogs, con = paste0(getwd(), "/samples/clean/blogs.txt"))
 writeLines(text = news, con = paste0(getwd(), "/samples/clean/news.txt"))
 ```
 
-```{r, echo=TRUE, eval=FALSE}
+```{r, echo=FALSE, eval=FALSE}
 #Assess 1-grams
 strsplit_space_tokenizer <- function(x)
     unlist(strsplit(as.character(x), "[[:space:]]+"))
@@ -330,7 +348,7 @@ freq <- lapply(X = freq, FUN = sort, decreasing = TRUE)
 #plot(x = 1:10, y = cdf(10))
 ```
 
-```{r, echo=TRUE, eval=FALSE}
+```{r, echo=FALSE, eval=FALSE}
 bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 4))}
 
 ctrl <- list(tokenize = bigramtokenizer, tolower = FALSE)
@@ -348,7 +366,7 @@ freq <- lapply(X = freq, FUN = sort, decreasing = TRUE)
 #plot(x = 1:10, y = cdf(10))
 ```
 
-```{r, echo=TRUE, eval=FALSE}
+```{r, echo=FALSE, eval=FALSE}
 #Term-Document Matrix
 tdm <- TermDocumentMatrix(texts)
 ```
