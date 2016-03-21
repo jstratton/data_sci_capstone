@@ -11,6 +11,12 @@ library(RWeka)
 library(SnowballC)
 ```
 
+# Abstract  
+
+# Introduction  
+
+# Results  
+
 ```{r exploring_txts, echo=FALSE, cache=TRUE}
 # Load full files
 docs <- DirSource(directory = paste0(getwd(),"/final/en_US"), encoding = "UTF-8")
@@ -244,3 +250,267 @@ Heaps_1 <- Heaps_plot(x = tdm_1, lwd = 5, lty = 3, col = "blue", main = "Heaps P
 ```
 
 Going back to our wordcount, I would extrapolate a vocabulary size of `r  format(ceiling(exp((Heaps_1[2]*log(sum(sapply(X = words_per_line, FUN = sum))) + Heaps_1[1]))), scientific = FALSE)` for this corpus.
+
+# Appendix: R Code used to Generate this Report
+
+## Load Required Libraries  
+
+```{r, echo=TRUE, eval=FALSE}
+library(tm)
+library(RWeka)
+library(SnowballC)
+```
+
+## Load Raw Texts  
+
+```{r, echo=TRUE, eval=FALSE}
+# Load full files
+docs <- DirSource(directory = paste0(getwd(),"/final/en_US"), encoding = "UTF-8")
+
+texts <- VCorpus(docs)
+
+texts <- tm_map(texts, stripWhitespace)
+
+texts <- tm_map(texts, content_transformer(gsub), pattern = "[^ [[:alpha:]]", replacement = "")
+
+```
+
+## Analyze Raw Texts
+
+```{r, echo=TRUE, eval=FALSE}
+
+line_count <- sapply(X = texts, FUN = function(x){length(x[[1]])})
+
+chars_per_line <- lapply(X = texts, FUN = function(x){nchar(x[[1]])})
+
+words_per_line <- lapply(X = texts, FUN = function(x){
+        sapply(X = strsplit(x[[1]], split = "[[:space:]]+"), FUN = length)
+})
+```
+
+## Output the Results of the Raw Text Analysis
+
+```{r, echo=TRUE, eval=FALSE}
+line_count_output <- data.frame(line_count, row.names = c("Blogs", "News", "Twitter"))
+colnames(line_count_output) <- "Number of Lines"
+line_count_output
+
+chars_per_line_output <- sapply(X = chars_per_line, FUN = summary)
+words_per_line_output <- sapply(X = words_per_line, FUN = summary)
+
+colnames(chars_per_line_output) <- c("Blogs", "News", "Twitter")
+colnames(words_per_line_output) <- c("Blogs", "News", "Twitter")
+
+chars_per_line_output
+words_per_line_output
+```
+
+## Produce a Clean Copy of the Text
+
+```{r, echo=TRUE, eval=FALSE}
+# Clean the text in the corpus
+
+docs <- DirSource(directory = paste0(getwd(),"/final/en_US"), encoding = "UTF-8")
+
+texts <- VCorpus(docs)
+
+# Remove whitespace
+texts <- tm_map(texts, stripWhitespace)
+
+# Remove the rarely used low info characters from the corpus
+texts <- tm_map(texts, content_transformer(gsub), pattern = "[^ [[:alpha:]]", replacement = "")
+
+texts <- tm_map(texts, content_transformer(tolower))
+
+# Remove swear words
+swears <- c("bastard", "bitch", "cunt", "damn", "fuck", "hell", "shit", "ass", "shitass")
+
+texts <- tm_map(texts, removeWords, swears)
+
+# Remove swear words part II
+rm_complex_swear_words <- function(x){
+        # Swear words taken from https://en.wiktionary.org/wiki/Category:English_swear_words
+        
+        # Ass can't be removed easily because too many legitimate words have this word but asshole can be removed
+        x <- gsub(pattern = "ass[:space:]*hole", replacement = "", x = x, ignore.case = TRUE)
+        
+        x <- gsub(pattern = "god.*?damn", replacement = "", x = x, ignore.case = TRUE)
+        
+        #Taking out the word shit will get rid of "holy shit"
+        
+        x <- gsub(pattern = "son of a whore", replacement = "", x = x, ignore.case = TRUE)
+        
+        x <- gsub(pattern = "mother.*?fucker", replacement = "", x = x, ignore.case = TRUE)
+        
+        x
+}
+
+texts <- tm_map(texts, content_transformer(rm_complex_swear_words))
+
+# Remove webaddresses
+rm_web_addresses <- function(x){
+        x <- gsub(pattern = "(http|w{3}).*?(com|edu|org| )", replacement = "", x = x, ignore.case = TRUE)
+        
+        # Get webadresses that appear at the end of a line.
+        x <- gsub(pattern = "((http|w{3}).*?(com|edu|org|)*)$", replacement = "", x = x, ignore.case = TRUE)
+        
+        x
+}
+
+texts <- tm_map(texts, content_transformer(rm_web_addresses))
+
+# Remove stop words
+texts <- tm_map(texts, removeWords, stopwords("english"))
+
+# Remove any whitespace my cleaning regexes created
+texts <- tm_map(texts, stripWhitespace)
+```
+
+## Take Random Samples from the Data Set
+
+Used to check for bias. Results from Sample 1 were shown in order to minimize the length of this report. Similar results were found in Samples 2-5.
+
+```{r, echo=TRUE, eval=FALSE}
+line_count <- sapply(X = texts, FUN = function(x){length(x[[1]])})
+
+# Use a random 5% sample from the corpus for each sample
+pcnt <- 5
+set.seed(3202016)
+
+# Make sample 1
+sample_text_1 <- texts
+
+sample_text_1[[1]][[1]] <- sample(x = sample_text_1[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+sample_text_1[[2]][[1]] <- sample(x = sample_text_1[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+sample_text_1[[3]][[1]] <- sample(x = sample_text_1[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
+
+# Make sample 2
+sample_text_2 <- texts
+
+sample_text_2[[1]][[1]] <- sample(x = sample_text_2[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+
+sample_text_2[[2]][[1]] <- sample(x = sample_text_2[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+
+sample_text_2[[3]][[1]] <- sample(x = sample_text_2[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
+
+# Make sample 3
+sample_text_3 <- texts
+
+sample_text_3[[1]][[1]] <- sample(x = sample_text_3[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+
+sample_text_3[[2]][[1]] <- sample(x = sample_text_3[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+
+sample_text_3[[3]][[1]] <- sample(x = sample_text_3[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
+
+# Make sample 4
+sample_text_4 <- texts
+
+sample_text_4[[1]][[1]] <- sample(x = sample_text_4[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+
+sample_text_4[[2]][[1]] <- sample(x = sample_text_4[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+
+sample_text_4[[3]][[1]] <- sample(x = sample_text_4[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
+
+# Make sample 5
+sample_text_5 <- texts
+
+sample_text_5[[1]][[1]] <- sample(x = sample_text_5[[1]][[1]], size = ceiling(pcnt*line_count[1]/100))
+
+sample_text_5[[2]][[1]] <- sample(x = sample_text_5[[2]][[1]], size = ceiling(pcnt*line_count[2]/100))
+
+sample_text_5[[3]][[1]] <- sample(x = sample_text_5[[3]][[1]], size = ceiling(pcnt*line_count[3]/100))
+
+```
+## Analyze the Random Text Samples  
+
+```{r, echo=TRUE, eval=FALSE}
+# Analyze 1-grams
+strsplit_space_tokenizer <- function(x)
+    unlist(strsplit(as.character(x), "[[:space:]]+"))
+
+ctrl <- list(tokenize = strsplit_space_tokenizer, tolower = FALSE)
+
+freq_1 <- lapply(X = sample_text_1, FUN = termFreq, control = ctrl)
+freq_2 <- lapply(X = sample_text_2, FUN = termFreq, control = ctrl)
+freq_3 <- lapply(X = sample_text_3, FUN = termFreq, control = ctrl)
+freq_4 <- lapply(X = sample_text_4, FUN = termFreq, control = ctrl)
+freq_5 <- lapply(X = sample_text_5, FUN = termFreq, control = ctrl)
+
+# Analyze 2- through 4-grams
+bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 4))}
+
+ctrl <- list(tokenize = bigramtokenizer, tolower = FALSE)
+
+
+n_gram_freq_1 <- lapply(X = sample_text_1, FUN = termFreq, control = ctrl)
+n_gram_freq_2 <- lapply(X = sample_text_2, FUN = termFreq, control = ctrl)
+n_gram_freq_3 <- lapply(X = sample_text_3, FUN = termFreq, control = ctrl)
+n_gram_freq_4 <- lapply(X = sample_text_4, FUN = termFreq, control = ctrl)
+n_gram_freq_5 <- lapply(X = sample_text_5, FUN = termFreq, control = ctrl)
+
+# Sort the frequency lists
+freq_1 <- lapply(X = freq_1, FUN = sort, decreasing = TRUE)
+freq_2 <- lapply(X = freq_2, FUN = sort, decreasing = TRUE)
+freq_3 <- lapply(X = freq_3, FUN = sort, decreasing = TRUE)
+freq_4 <- lapply(X = freq_4, FUN = sort, decreasing = TRUE)
+freq_5 <- lapply(X = freq_5, FUN = sort, decreasing = TRUE)
+
+n_gram_freq_1 <- lapply(X = n_gram_freq_1, FUN = sort, decreasing = TRUE)
+n_gram_freq_2 <- lapply(X = n_gram_freq_2, FUN = sort, decreasing = TRUE)
+n_gram_freq_3 <- lapply(X = n_gram_freq_3, FUN = sort, decreasing = TRUE)
+n_gram_freq_4 <- lapply(X = n_gram_freq_4, FUN = sort, decreasing = TRUE)
+n_gram_freq_5 <- lapply(X = n_gram_freq_5, FUN = sort, decreasing = TRUE)
+```
+
+## Create Term-Document-Matrices
+
+```{r, echo=TRUE, eval=FALSE}
+# Maker term document matrices for all 5 samples
+tdm_1 <- TermDocumentMatrix(sample_text_1)
+tdm_2 <- TermDocumentMatrix(sample_text_2)
+tdm_3 <- TermDocumentMatrix(sample_text_3)
+tdm_4 <- TermDocumentMatrix(sample_text_4)
+tdm_5 <- TermDocumentMatrix(sample_text_5)
+```
+
+## Output for Displaying the 1-Gram Table
+
+```{r, echo=TRUE, eval=FALSE}
+all_monograms_table <- cbind(1:10, rownames(freq_1[[1]][1:10]), freq_1[[1]][1:10], rownames(freq_1[[2]][1:10]), freq_1[[2]][1:10], rownames(freq_1[[3]][1:10]), freq_1[[3]][1:10])
+
+rownames(all_monograms_table) <- rep(x = "", times = 10)
+colnames(all_monograms_table) <- c("Rank", "Blogs", "Counts", "News", "Counts", "Twitter", "Counts")
+
+all_monograms_table
+```
+## Code for Producing the n-gram Table
+
+```{r, echo=TRUE, eval=FALSE}
+all_ngrams_table <- cbind(1:10, rownames(n_gram_freq_1[[1]][1:10]), n_gram_freq_1[[1]][1:10], rownames(n_gram_freq_1[[2]][1:10]), n_gram_freq_1[[2]][1:10], rownames(n_gram_freq_1[[3]][1:10]), n_gram_freq_1[[3]][1:10])
+
+rownames(all_ngrams_table) <- rep(x = "", times = 10)
+colnames(all_ngrams_table) <- c("Rank", "Blogs", "Counts", "News", "Counts", "Twitter", "Counts")
+
+all_ngrams_table
+```
+
+## Make a Frequency-Rank Plot for all Three Document Sources
+
+```{r, echo=TRUE, eval=FALSE}
+# Make a 1x3 plot of the frequencies
+par(mfcol = c(1,3))
+
+plot(x = 1:length(freq_1[[1]]), y = freq_1[[1]], type = "l", main = "Blog Word Frequencies", xlab = "Word Rank", ylab = "Word Frequency(Counts)", lwd = 5)
+plot(x = 1:length(freq_1[[2]]), y = freq_1[[2]], type = "l", main = "News Word Frequencies", xlab = "Word Rank", ylab = "Word Frequency(Counts)", lwd = 5)
+plot(x = 1:length(freq_1[[3]]), y = freq_1[[3]], type = "l", main = "Twitter Word Frequencies", xlab = "Word Rank", ylab = "Word Frequency(Counts)", lwd = 5)
+```
+
+## Make a Zipf and a Heaps Plot to determine if the data follows common Linguistic Trends.
+
+```{r, echo=TRUE, eval=FALSE}
+# Make a 1x3 plot of the frequencies
+par(mfcol = c(1,2))
+
+Zipf_1 <- Zipf_plot(x = tdm_1, lwd = 5, lty = 3, col = "blue", main = "Zipf Plot")
+Heaps_1 <- Heaps_plot(x = tdm_1, lwd = 5, lty = 3, col = "blue", main = "Heaps Plot", xlab = "log(total no. of words)", ylab = "log(vocabulary size)")
+```
