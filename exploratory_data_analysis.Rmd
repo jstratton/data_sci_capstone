@@ -244,6 +244,17 @@ twit_ngrams_table
 
 ```
 
+```{r freq_dist_plots, echo=FALSE}
+# Make a 1x3 plot of the frequencies
+par(mfcol = c(1,3))
+
+plot(x = 1:length(freq_1[[1]]), y = freq_1[[1]], type = "l", main = "Blog Word Frequencies", xlab = "Word Rank", ylab = "Word Frequency(Counts)", lwd = 5)
+plot(x = 1:length(freq_1[[2]]), y = freq_1[[2]], type = "l", main = "News Word Frequencies", xlab = "Word Rank", ylab = "Word Frequency(Counts)", lwd = 5)
+plot(x = 1:length(freq_1[[3]]), y = freq_1[[3]], type = "l", main = "Twitter Word Frequencies", xlab = "Word Rank", ylab = "Word Frequency(Counts)", lwd = 5)
+```
+
+
+
 ```{r, echo=FALSE, eval=FALSE}
 #Load sample files
 docs <- DirSource(directory = paste0(getwd(), "/samples/clean"), encoding = "UTF-8")
