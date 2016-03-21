@@ -253,7 +253,14 @@ plot(x = 1:length(freq_1[[2]]), y = freq_1[[2]], type = "l", main = "News Word F
 plot(x = 1:length(freq_1[[3]]), y = freq_1[[3]], type = "l", main = "Twitter Word Frequencies", xlab = "Word Rank", ylab = "Word Frequency(Counts)", lwd = 5)
 ```
 
+```{r diagnostic_plots, echo=FALSE}
+# Make a 1x3 plot of the frequencies
+par(mfcol = c(1,2))
 
+Zipf_1 <- Zipf_plot(x = tdm_1, lwd = 5, lty = 3, col = "blue", main = "Zipf Plot")
+Heaps_1 <- Heaps_plot(x = tdm_1, lwd = 5, lty = 3, col = "blue", main = "Heaps Plot", xlab = "log(total no. of terms in texts)", ylab = "log(vocabulary size)")
+
+```
 
 ```{r, echo=FALSE, eval=FALSE}
 #Load sample files
