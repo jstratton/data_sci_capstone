@@ -216,21 +216,10 @@ all_monograms_table
 ```
 
 ```{r n_gram_tables, echo=FALSE}
-blog_ngrams_table <- cbind(1:10, rownames(n_gram_freq_1[[1]][1:10]), n_gram_freq_1[[1]][1:10])
+all_ngrams_table <- cbind(1:10, rownames(n_gram_freq_1[[1]][1:10]), n_gram_freq_1[[1]][1:10], rownames(n_gram_freq_1[[2]][1:10]), n_gram_freq_1[[2]][1:10], rownames(n_gram_freq_1[[3]][1:10]), n_gram_freq_1[[3]][1:10])
 
-news_ngrams_table <- cbind(1:10, rownames(n_gram_freq_1[[2]][1:10]), n_gram_freq_1[[2]][1:10])
-
-twit_ngrams_table <- cbind(1:10, rownames(n_gram_freq_1[[3]][1:10]), n_gram_freq_1[[3]][1:10])
-
-rownames(blog_ngrams_table) <- rep(x = "", times = 10)
-blog_ngrams_table
-
-rownames(news_ngrams_table) <- rep(x = "", times = 10)
-news_ngrams_table
-
-rownames(twit_ngrams_table) <- rep(x = "", times = 10)
-twit_ngrams_table
-
+rownames(all_ngrams_table) <- rep(x = "", times = 10)
+all_ngrams_table
 ```
 
 ```{r freq_dist_plots, echo=FALSE}
