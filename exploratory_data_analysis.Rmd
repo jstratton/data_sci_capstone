@@ -212,6 +212,8 @@ tdm_5 <- TermDocumentMatrix(sample_text_5)
 all_monograms_table <- cbind(1:10, rownames(freq_1[[1]][1:10]), freq_1[[1]][1:10], rownames(freq_1[[2]][1:10]), freq_1[[2]][1:10], rownames(freq_1[[3]][1:10]), freq_1[[3]][1:10])
 
 rownames(all_monograms_table) <- rep(x = "", times = 10)
+colnames(all_monograms_table) <- c("Rank", "Blogs", "Counts", "News", "Counts", "Twitter", "Counts")
+
 all_monograms_table
 ```
 
@@ -219,6 +221,8 @@ all_monograms_table
 all_ngrams_table <- cbind(1:10, rownames(n_gram_freq_1[[1]][1:10]), n_gram_freq_1[[1]][1:10], rownames(n_gram_freq_1[[2]][1:10]), n_gram_freq_1[[2]][1:10], rownames(n_gram_freq_1[[3]][1:10]), n_gram_freq_1[[3]][1:10])
 
 rownames(all_ngrams_table) <- rep(x = "", times = 10)
+colnames(all_ngrams_table) <- c("Rank", "Blogs", "Counts", "News", "Counts", "Twitter", "Counts")
+
 all_ngrams_table
 ```
 
