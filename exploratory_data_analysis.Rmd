@@ -209,21 +209,10 @@ tdm_5 <- TermDocumentMatrix(sample_text_5)
 ```
 
 ```{r freq_term_tables, echo=FALSE}
-blog_monograms_table <- cbind(1:10, rownames(freq_1[[1]][1:10]), freq_1[[1]][1:10])
+all_monograms_table <- cbind(1:10, rownames(freq_1[[1]][1:10]), freq_1[[1]][1:10], rownames(freq_1[[2]][1:10]), freq_1[[2]][1:10], rownames(freq_1[[3]][1:10]), freq_1[[3]][1:10])
 
-news_monograms_table <- cbind(1:10, rownames(freq_1[[2]][1:10]), freq_1[[2]][1:10])
-
-twit_monograms_table <- cbind(1:10, rownames(freq_1[[3]][1:10]), freq_1[[3]][1:10])
-
-rownames(blog_monograms_table) <- rep(x = "", times = 10)
-blog_monograms_table
-
-rownames(news_monograms_table) <- rep(x = "", times = 10)
-news_monograms_table
-
-rownames(twit_monograms_table) <- rep(x = "", times = 10)
-twit_monograms_table
-
+rownames(all_monograms_table) <- rep(x = "", times = 10)
+all_monograms_table
 ```
 
 ```{r n_gram_tables, echo=FALSE}
@@ -258,7 +247,7 @@ plot(x = 1:length(freq_1[[3]]), y = freq_1[[3]], type = "l", main = "Twitter Wor
 par(mfcol = c(1,2))
 
 Zipf_1 <- Zipf_plot(x = tdm_1, lwd = 5, lty = 3, col = "blue", main = "Zipf Plot")
-Heaps_1 <- Heaps_plot(x = tdm_1, lwd = 5, lty = 3, col = "blue", main = "Heaps Plot", xlab = "log(total no. of terms in texts)", ylab = "log(vocabulary size)")
+Heaps_1 <- Heaps_plot(x = tdm_1, lwd = 5, lty = 3, col = "blue", main = "Heaps Plot", xlab = "log(total no. of words)", ylab = "log(vocabulary size)")
 
 ```
 
