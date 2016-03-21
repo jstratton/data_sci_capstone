@@ -209,11 +209,11 @@ tdm_5 <- TermDocumentMatrix(sample_text_5)
 ```
 
 ```{r freq_term_tables, echo=FALSE}
-blog_monograms_table <- cbind(1:10, rownames(freq_1[[1]][1:10]), freq_1[[1]][1:10], rownames(freq_2[[1]][1:10]), freq_2[[1]][1:10], rownames(freq_3[[1]][1:10]), freq_3[[1]][1:10], rownames(freq_4[[1]][1:10]), freq_4[[1]][1:10], rownames(freq_5[[1]][1:10]), freq_5[[1]][1:10])
+blog_monograms_table <- cbind(1:10, rownames(freq_1[[1]][1:10]), freq_1[[1]][1:10])
 
-news_monograms_table <- cbind(1:10, rownames(freq_1[[2]][1:10]), freq_1[[2]][1:10], rownames(freq_2[[2]][1:10]), freq_2[[2]][1:10], rownames(freq_3[[2]][1:10]), freq_3[[2]][1:10], rownames(freq_4[[2]][1:10]), freq_4[[2]][1:10], rownames(freq_5[[2]][1:10]), freq_5[[2]][1:10])
+news_monograms_table <- cbind(1:10, rownames(freq_1[[2]][1:10]), freq_1[[2]][1:10])
 
-twit_monograms_table <- cbind(1:10, rownames(freq_1[[3]][1:10]), freq_1[[3]][1:10], rownames(freq_2[[3]][1:10]), freq_2[[3]][1:10], rownames(freq_3[[3]][1:10]), freq_3[[3]][1:10], rownames(freq_4[[3]][1:10]), freq_4[[3]][1:10], rownames(freq_5[[3]][1:10]), freq_5[[3]][1:10])
+twit_monograms_table <- cbind(1:10, rownames(freq_1[[3]][1:10]), freq_1[[3]][1:10])
 
 rownames(blog_monograms_table) <- rep(x = "", times = 10)
 blog_monograms_table
@@ -223,6 +223,24 @@ news_monograms_table
 
 rownames(twit_monograms_table) <- rep(x = "", times = 10)
 twit_monograms_table
+
+```
+
+```{r n_gram_tables, echo=FALSE}
+blog_ngrams_table <- cbind(1:10, rownames(n_gram_freq_1[[1]][1:10]), n_gram_freq_1[[1]][1:10])
+
+news_ngrams_table <- cbind(1:10, rownames(n_gram_freq_1[[2]][1:10]), n_gram_freq_1[[2]][1:10])
+
+twit_ngrams_table <- cbind(1:10, rownames(n_gram_freq_1[[3]][1:10]), n_gram_freq_1[[3]][1:10])
+
+rownames(blog_ngrams_table) <- rep(x = "", times = 10)
+blog_ngrams_table
+
+rownames(news_ngrams_table) <- rep(x = "", times = 10)
+news_ngrams_table
+
+rownames(twit_ngrams_table) <- rep(x = "", times = 10)
+twit_ngrams_table
 
 ```
 
