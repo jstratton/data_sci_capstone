@@ -82,3 +82,8 @@ texts <- lapply(X = texts, FUN = gsub, pattern = "shit[deginrty]*", replacement 
 texts <- lapply(X = texts, FUN = gsub,
                 pattern = "(son[s]*)*.*?(of)*.*(a*).*(whore)+(s| )*",
                 replacement = "", ignore.case = TRUE)
+
+# Save the text files
+writeLines(texts$blogs, con = paste0(getwd(), "/samples/clean/blogs.txt"))
+writeLines(texts$news, con = paste0(getwd(), "/samples/clean/news.txt"))
+writeLines(texts$twit, con = paste0(getwd(), "/samples/clean/twit.txt"))
