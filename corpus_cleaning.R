@@ -2,77 +2,83 @@
 
 # Load Required Libraries
 
-# ## Remove all punctuation except for ' and -
-# sample_text <- tm_map(x = sample_text, FUN = gsub, 
-#                       pattern = "[][!#$%&()*+,./:;<=>?@^_`{|}~]", 
-#                       replacement = "", ignore.case = TRUE)
-# 
-# ## Remove all numerals
-# sample_text <- tm_map(x = sample_text, FUN = removeNumbers)
-# 
-# ## Remove all webaddresses
-# sample_text <- tm_map(x = sample_text, FUN = gsub,
-#                       pattern = "((http|w{3}).*?(com|edu|org| ))",
-#                       replacement = "", ignore.case = TRUE)
-# 
-# ## Remove all swearwords (https://en.wiktionary.org/wiki/Category:English_swear_words)
-# 
-# ### Remove arse/asshole
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "(ass|arse).*hole", 
-#                                         replacement = "", ignore.case = TRUE)
-# 
-# ### Remove all singlet "ass" tokens
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "ass[^[:alnum:]]",
-#                                         replacement = "", ignore.case = TRUE)
-# 
-# ### Remove all variants of goddamn
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "god.*?damn",
-#                                         replacement = "", ignore.case = TRUE)
-# 
-# ### Remove all bastards from the text
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "bastard[s]*", replacement = "", ignore.case = TRUE)
-# 
-# ### Remove all instances of bitch
-# sample_text <- tm_map(x = sample_text, FUN = gsub,
-#                       pattern = "(son[s]*)*.*?(of)*.*(a*).*bitch(es| )",
-#                       replacement = "", ignore.case = TRUE)
-# 
-# ### Remove the word cunt
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "cunt", replacement = "",
-#                       ignore.case = TRUE)
-# 
-# ### Remove the word damn
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "damn",
-#                       replacement = "", ignore.case = TRUE)
-# 
-# ### Remove the phrase mother fucker
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "mother.*?fucker",
-#                       replacement = "", ignore.case = TRUE)
-# 
-# ### Remove fuck
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "fuck",
-#                       replacement = "", ignore.case = TRUE)
-# 
-# ### Remove the phrase Holy Shit
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "holy.*?shit",
-#                       replacement = "", ignore.case = TRUE)
-# 
-# ### Remove the phrase shitass
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "shit.*?ass",
-#                       replacement = "", ignore.case = TRUE)
-# 
-# ### Remove the word shit
-# sample_text <- tm_map(x = sample_text, FUN = gsub, pattern = "shit", replacement = "", 
-#                       ignore.case = TRUE)
-# 
-# ### Remove the phrase son of a whore
-# sample_text <- tm_map(x = sample_text, FUN = gsub, 
-#                       pattern = "(son[s]*)*.*?(of)*.*(a*).*whore(s| )", 
-#                       replacement = "", ignore.case = TRUE)
-# 
-# sample_text <- tm_map(x = sample_text, FUN = stripWhitespace)
-# 
-# # Take a random 5% sample from the corpus
-# pcnt <- 5
-# set.seed(3232016)
-# sample_text <- lapply(X = texts, FUN = function(x){sample(x[[1]], size = ceiling(pcnt*length(x[[1]])/100))})
+# Load the txt files
+dir <- paste0(getwd(),"/final/en_US")
+
+texts <- list(blogs = readLines(con = paste0(dir, "/en_US.blogs.txt"), encoding = "UTF-8"),
+          news = readLines(con = paste0(dir, "/en_US.news.txt"), encoding = "UTF-8"),
+          twit = readLines(con = paste0(dir, "/en_US.twitter.txt"), encoding = "UTF-8"))
+
+# I've chosen to use a sample size of 5% for the sake of processing time
+pcnt <- 5
+set.seed(3242016)
+texts <- lapply(X = texts, function(x){sample(x, size = ceiling(pcnt*length(x)/100))})
+
+# Start cleaning the texts
+## Remove all punctuation except for ' and -
+texts <- lapply(X = texts, FUN = gsub, pattern = "[][!#$%&\"()*+,./:;<=>?@^_`{|}~]",
+                replacement = "", ignore.case = TRUE)
+
+## Remove all numbers
+texts <- lapply(X = texts, FUN = gsub, pattern = "[[:digit:]]", replacement = "",
+                ignore.case = TRUE)
+
+## Remove all webaddresses
+texts <- lapply(X = texts, FUN = gsub, pattern = "((http|w{3}).*?(com|edu|org| ))",
+                replacement = "", ignore.case = TRUE)
+
+## Remove all swearwords (https://en.wiktionary.org/wiki/Category:English_swear_words)
+
+### Remove all instances of the words ass/arsehole
+texts <- lapply(X = texts, FUN = gsub, pattern = "(ass|arse).*hole",
+                replacement = "", ignore.case = TRUE)
+
+### Remove all singlet ass tokens
+texts <- lapply(X = texts, FUN = gsub, pattern = "ass([^[:alnum:]]|$)",
+                replacement = "", ignore.case = TRUE)
+
+### Remove all variants of goddamn
+texts <- lapply(X = texts, FUN = gsub, pattern = "god.*?damn",
+                replacement = "", ignore.case = TRUE)
+
+### Remove all bastards from the text
+texts <- lapply(X = texts, FUN = gsub, pattern = "bastard[s]*",
+                replacement = "", ignore.case = TRUE)
+
+### Remove all instances of bitch
+texts <- lapply(X = texts, FUN = gsub,
+                pattern = "(son[s]*)*.*?(of)*.*(a*).*(bitch)+(es| )*",
+                replacement = "", ignore.case = TRUE)
+
+### Remove the word cunt
+texts <- lapply(X = texts, FUN = gsub, pattern = "cunt", replacement = "",
+                ignore.case = TRUE)
+
+### Remove the word damn
+texts <- lapply(X = texts, FUN = gsub, pattern = "damn", replacement = "",
+                ignore.case = TRUE)
+
+### Remove the phrase mother fucker
+texts <- lapply(X = texts, FUN = gsub, pattern = "mother.*?fucker",
+                replacement = "", ignore.case = TRUE)
+
+### Remove the word fuck and its variants
+texts <- lapply(X = texts, FUN = gsub, pattern = "fuck[deginr]*", replacement = "",
+                ignore.case = TRUE)
+
+### Remove the phrase Holy Shit
+texts <- lapply(X = texts, FUN = gsub, pattern = "holy.*?shit",
+                replacement = "", ignore.case = TRUE)
+
+### Remove the phrase shitass
+texts <- lapply(X = texts, FUN = gsub, pattern = "shit.*?ass",
+                replacement = "", ignore.case = TRUE)
+
+### Remove the word shit and its variants
+texts <- lapply(X = texts, FUN = gsub, pattern = "shit[deginrty]*", replacement = "",
+                ignore.case = TRUE)
+
+### Remove all instances of whore
+texts <- lapply(X = texts, FUN = gsub,
+                pattern = "(son[s]*)*.*?(of)*.*(a*).*(whore)+(s| )*",
+                replacement = "", ignore.case = TRUE)
