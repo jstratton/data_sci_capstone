@@ -44,7 +44,7 @@ words_per_line <- lapply(X = texts, FUN = function(x){
 
 The first step is to determine the sizes of each document. Each line in a document is the number of distinct text entries within that document. Twitter posts are the largest category because they are short and don't take up a lot of memory.
 
-Table 1: Document Line Counts
+#### Table 1: Document Line Counts
 
 ```{r output_raw_counts, echo=FALSE}
 line_count_output <- data.frame(line_count, row.names = c("Blogs", "News", "Twitter"))
@@ -58,7 +58,7 @@ colnames(words_per_line_output) <- c("Blogs", "News", "Twitter")
 
 Word count is another useful way to categorize the data. Blog posts were typically longer than news articles or twitter posts. Strangely, some of the lines of text had 0 words. This text was probably thrown out due to corrupted data.
 
-Table 2: Document Word Count Data
+#### Table 2: Document Word Count Data
 
 ```{r output_words_per_line, echo=FALSE}
 words_per_line_output
@@ -225,7 +225,7 @@ tdm_5 <- TermDocumentMatrix(sample_text_5)
 
 Next, I found the frequencies of different words in each document. I tabulated the top ten most common words by medium below. All of the words on the list are common English words. The only suprise is that numeric phrases like "one" or "two" appeared on this list. Note that the number of counts is radically different between mediums.
 
-Table 3: Top Ten Most Common Words by Medium
+#### Table 3: Top Ten Most Common Words by Medium
 
 ```{r freq_term_tables, echo=FALSE}
 all_monograms_table <- cbind(1:10, rownames(freq_1[[1]][1:10]), freq_1[[1]][1:10], rownames(freq_1[[2]][1:10]), freq_1[[2]][1:10], rownames(freq_1[[3]][1:10]), freq_1[[3]][1:10])
@@ -238,7 +238,7 @@ all_monograms_table
 
 Below I tabulated the most common phrases by medium. All of the phrases sound like common English phrases. This means that the sample size is large enough to be unbiased after data cleaning. Having these common English phrases will be helpful for training our lignuistic model. Major cities appearing on the Blogs and News list will be helpful for teaching my machine learning algorithm to recognize those locations.
 
-Table 4: Top Ten Most Common Phrases by Medium
+#### Table 4: Top Ten Most Common Phrases by Medium
 
 ```{r n_gram_tables, echo=FALSE}
 all_ngrams_table <- cbind(1:10, rownames(n_gram_freq_1[[1]][1:10]), n_gram_freq_1[[1]][1:10], rownames(n_gram_freq_1[[2]][1:10]), n_gram_freq_1[[2]][1:10], rownames(n_gram_freq_1[[3]][1:10]), n_gram_freq_1[[3]][1:10])
@@ -285,6 +285,12 @@ During my exploratory data analysis, I took 5 random text samples from the corpu
 Going forward, I will need to research models for predicting words. Considering how complex language is, trees will probably be too inefficient for our purposes. A generalized linear model or similar will probably be the best approach. Stemming the words in the Corpus down to their root form may help to reduce the size of the dictionary required to model the linguistics correctly. Completing the stem when determining the predicted word will be the challenge here.
 
 Predicting capitalization will be particularlly challenging. Hard coding capitalization based on punctuation will probably be more memory efficient than using machine learning for that purpose. On the other hand, teaching the model to capitalize proper names correctly will probably require machine learning. One approach to this is to determine the ratio of capitalization for a word. If it is over 50%, then the model can assume that the word will be capitalized. Or I could keep the capitalization in the Corpus throughout the process and use that to train my model. I will need to look into this problem further.
+
+
+```{r wrodcloud plot, echo=FALSE}
+library(wordcloud)
+wordcloud(words = rownames(freq_1[[1]][1:20]), freq = freq_1[[1]][1:20])
+```
 
 # Appendix: R Code used to Generate this Report
 
