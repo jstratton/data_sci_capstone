@@ -286,12 +286,6 @@ Going forward, I will need to research models for predicting words. Considering 
 
 Predicting capitalization will be particularlly challenging. Hard coding capitalization based on punctuation will probably be more memory efficient than using machine learning for that purpose. On the other hand, teaching the model to capitalize proper names correctly will probably require machine learning. One approach to this is to determine the ratio of capitalization for a word. If it is over 50%, then the model can assume that the word will be capitalized. Or I could keep the capitalization in the Corpus throughout the process and use that to train my model. I will need to look into this problem further.
 
-
-```{r wrodcloud plot, echo=FALSE}
-library(wordcloud)
-wordcloud(words = rownames(freq_1[[1]][1:20]), freq = freq_1[[1]][1:20])
-```
-
 # Appendix: R Code used to Generate this Report
 
 ## Load Required Libraries  
