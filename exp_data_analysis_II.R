@@ -22,21 +22,24 @@ ctrl <- list(tokenize = strsplit_space_tokenizer, tolower = FALSE)
 freq_1 <- lapply(X = texts, FUN = termFreq, control = ctrl)
 
 # Find the 2-gram frequencies
-bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 2))}
+bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 2, 
+                                                              delimiters = " \n"))}
 
 ctrl <- list(tokenize = bigramtokenizer, tolower = FALSE)
 
 freq_2 <- lapply(X = texts, FUN = termFreq, control = ctrl)
 
 # Find the 3-gram frequencies
-trigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 3, max = 3))}
+trigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 3, max = 3,
+                                                               delimiters = " \n"))}
 
 ctrl <- list(tokenize = trigramtokenizer, tolower = FALSE)
 
 freq_3 <- lapply(X = texts, FUN = termFreq, control = ctrl)
 
 # Find the 4-gram frequencies
-tetragramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 4, max = 4))}
+tetragramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 4, max = 4, 
+                                                                 delimiters = " \n"))}
 
 ctrl <- list(tokenize = tetragramtokenizer, tolower = FALSE)
 
