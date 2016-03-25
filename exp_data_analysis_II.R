@@ -108,3 +108,22 @@ rownames(tetragrams_table) <- rep(x = "", times = 10)
 colnames(tetragrams_table) <- c("Rank", "Blogs", "Counts", "News", "Counts", "Twitter", "Counts")
 
 tetragrams_table
+
+# Create a term document matrix to get Zipf and Heaps plots
+tdm <- TermDocumentMatrix(texts)
+
+# Make the plot and store the parameters.
+par(mfcol = c(1,2))
+
+Zipf_1 <- Zipf_plot(x = tdm, lwd = 5, lty = 3, col = "blue", main = "Zipf Plot")
+
+Heaps_1 <- Heaps_plot(x = tdm, lwd = 5, lty = 3, col = "blue", main = "Heaps Plot", 
+                      xlab = "log(total no. of words)",
+                      ylab = "log(vocabulary size)")
+
+# Total no. of words in the full corpus is 68864922
+n_words <- 68864922
+
+# Predict the vocabulary size to accurately handle the full corpus
+format(ceiling(exp((Heaps_1[2]*log(n_words) + Heaps_1[1]))), scientific = FALSE)
+
