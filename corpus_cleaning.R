@@ -87,3 +87,5 @@ output <- c(texts$blogs, texts$news, texts$twit)
 my_con = file(description = paste0(getwd(), "/samples/compiled/fulltext.txt"),
               encoding = "UTF-8")
 writeLines(output, con = my_con)
+
+close(my_con)
