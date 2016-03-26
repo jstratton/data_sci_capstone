@@ -1,6 +1,9 @@
 # This script contains code for importing and cleaning the corpus.
 
 # Load Required Libraries
+library(tm)
+library(RWeka)
+library(SnowballC)
 
 # Load the txt files
 dir <- paste0(getwd(),"/final/en_US")
@@ -11,17 +14,13 @@ texts <- list(blogs = readLines(con = paste0(dir, "/en_US.blogs.txt"), encoding 
 
 # I've chosen to use a sample size of 5% for the sake of processing time
 pcnt <- 5
-set.seed(3242016)
+set.seed(3252016)
 texts <- lapply(X = texts, function(x){sample(x, size = ceiling(pcnt*length(x)/100))})
 
 # Start cleaning the texts
-## Remove all punctuation except for ' and -
-texts <- lapply(X = texts, FUN = gsub, pattern = "[][!#$%&\"()*+,./:;<=>?@^_`{|}~]",
+## Remove all non-Eng chars, digits, and punctuation except for ' and -
+texts <- lapply(X = texts, FUN = gsub, pattern = "[^[:alpha:][:space:]'-]",
                 replacement = "", ignore.case = TRUE)
-
-## Remove all numbers
-texts <- lapply(X = texts, FUN = gsub, pattern = "[[:digit:]]", replacement = "",
-                ignore.case = TRUE)
 
 ## Remove all webaddresses
 texts <- lapply(X = texts, FUN = gsub, pattern = "((http|w{3}).*?(com|edu|org| ))",
@@ -84,5 +83,7 @@ texts <- lapply(X = texts, FUN = gsub,
                 replacement = "", ignore.case = TRUE)
 
 # Save the text file
-texts <- rbind(texts[[1:3]])
-writeLines(texts, con = paste0(getwd(), "/samples/compiled/fulltext.txt"))
+output <- c(texts$blogs, texts$news, texts$twit)
+my_con = file(description = paste0(getwd(), "/samples/compiled/fulltext.txt"),
+              encoding = "UTF-8")
+writeLines(output, con = my_con)
