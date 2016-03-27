@@ -39,25 +39,26 @@ ctrl <- list(tokenize = trigramtokenizer, tolower = FALSE)
 
 freq_3 <- termFreq(doc = texts[[1]], control = ctrl)
 
-# Find the 4-gram frequencies
-tetragramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 4, max = 4, 
-                                                                 delimiters = " \n"))}
-
-ctrl <- list(tokenize = tetragramtokenizer, tolower = FALSE)
-
-freq_4 <- termFreq(doc = texts[[1]], control = ctrl)
-
 # Sort the frequencies
 freq_1 <- sort(x = freq_1, decreasing = TRUE)
 freq_2 <- sort(x = freq_2, decreasing = TRUE)
 freq_3 <- sort(x = freq_3, decreasing = TRUE)
-freq_4 <- sort(x = freq_4, decreasing = TRUE)
 
-# Reduce memory load by removing all elements with frequency < 40
-freq_1 <- freq_1[freq_1 > 40]
-freq_2 <- freq_2[freq_2 > 40]
-freq_3 <- freq_3[freq_3 > 40]
-freq_4 <- freq_4[freq_4 > 40]
+# To make this run in < 5 minutes I will remove all elements with frequency < 200
+# As a result, we're not using any tetragrams in this model
+freq_1 <- freq_1[freq_1 > 200]
+freq_2 <- freq_2[freq_2 > 200]
+freq_3 <- freq_3[freq_3 > 200]
+
+# Save the character strings for each level of n-gram
+write.table(rownames(freq_1), 
+            file = paste0(getwd(), "/saved_models/laplace_smoothed/monograms.txt"))
+
+write.table(rownames(freq_2), 
+            file = paste0(getwd(), "/saved_models/laplace_smoothed/bigrams.txt"))
+
+write.table(rownames(freq_3), 
+            file = paste0(getwd(), "/saved_models/laplace_smoothed/trigrams.txt"))
 
 # Build word log-probability tables
 
@@ -66,32 +67,67 @@ prob_1 <- log(freq_1) - log(sum(freq_1))
 
 ## 2-gram word log-probability table
 
-### Set up a connection to create a text file with the bigram log probs
-my_con <- file(description = paste0(getwd(), "/saved_models/laplace_smoothed/bigrams.txt"),
-               open = "a")
-
 ### Find every entry of freq_2 beginning with the i-th ngram
 
 hits <- lapply(X = rownames(freq_1), FUN = function(k){grep(pattern = paste0("^", k, "[[:space:]]+"), 
                                                   x = rownames(freq_2))})
 
 ### Compute the log frequency for each continuation, and then save
-bigramconts <- matrix(data = 0, nrow = length(freq_1), ncol = length(freq_1))
-
-for(i in 1:length(freq_1)){
-        
-        bigramconts[i] <- sapply(X = rownames(freq_1), FUN = function(k){
+bigramconts <- sapply(X = hits, FUN = function(h){
                 # Temporarily store a subset of the frequency counts
-                temp_freq <- freq_2[hits[[i]]]
+                temp_freq <- freq_2[h]
                 
-                # Find the location of the matches for a given word
-                loc <- grep(pattern = paste0("[[:space:]]+", k, "$"),
-                     x = rownames(temp_freq))
+                sapply(X = rownames(freq_1), FUN = function(k){
+                        # Find the location of the matches for a given word
+                        loc <- grep(pattern = paste0("[[:space:]]+", k, "$"),
+                                        x = rownames(temp_freq))
+                                        
+                        # Pull the frequency for that word if found, 0 otherwise
+                        if(length(loc) > 0) output <- temp_freq[loc]
+                        else output <- 0
+                        }, USE.NAMES = FALSE)
                 
-                # Pull the frequency for that word if found, 0 otherwise
-                if(length(loc) > 0) output <- temp_freq[loc]
-                else output <- 0
         }, USE.NAMES = FALSE)
-}
 
-close(my_con)
+
+### Columns correspond to bigrams, rows correspond to words
+bigramconts <- apply(X = bigramconts, MARGIN = 2, FUN = function(k){
+        log(k + 1) - log(sum(k + 1))
+})
+
+write.table(bigramconts, 
+          file = paste0(getwd(), "/saved_models/laplace_smoothed/bigramprobs.txt"),
+          row.names = FALSE, col.names = FALSE)
+
+## 3-gram probability table
+
+### Find every entry of Freq_3 beginning with a given 2-gram
+hits <- lapply(X = rownames(freq_2), FUN = function(k){grep(pattern = paste0("^", k, "[[:space:]]+"), 
+                                                            x = rownames(freq_3))})
+
+### Compute the log frequency for each continuation, and then save
+trigramconts <- sapply(X = hits, FUN = function(h){
+                # Temporarily store a subset of the frequency counts
+                temp_freq <- freq_3[h]
+                
+                sapply(X = rownames(freq_1), FUN = function(k){
+                        # Find the location of the matches for a given word
+                        loc <- grep(pattern = paste0("[[:space:]]+", k, "$"),
+                                    x = rownames(temp_freq))
+                        
+                        # Pull the frequency for that word if found, 0 otherwise
+                        if(length(loc) > 0) output <- temp_freq[loc]
+                        else output <- 0
+                }, USE.NAMES = FALSE)
+                
+        }, USE.NAMES = FALSE) 
+
+### Columns correspond to trigrams, rows correspond to words
+trigramconts <- apply(X = trigramconts, MARGIN = 2, FUN = function(k){
+        log(k + 1) - log(sum(k + 1))
+})
+
+### Save the trigram probability table
+write.table(trigramconts, 
+            file = paste0(getwd(), "/saved_models/laplace_smoothed/trigramprobs.txt"),
+            row.names = FALSE, col.names = FALSE)
