@@ -70,23 +70,27 @@ prob_1 <- log(freq_1) - log(sum(freq_1))
 my_con <- file(description = paste0(getwd(), "/saved_models/laplace_smoothed/bigrams.txt"),
                open = "a")
 
-### Store the rownames of the frequencies in their own vectors to make the code more efficient
-monograms <- rownames(freq_1)
-bigrams <- rownames(freq_2)
-trigrams <- rownames(freq_3)
-tetragrams <- rownames(freq_4)
-
 ### Find every entry of freq_2 beginning with the i-th ngram
 
-hits <- lapply(X = monograms, FUN = function(k){grep(pattern = paste0("^", k, "[[:space:]]+"), 
-                                                  x = bigrams)})
+hits <- lapply(X = rownames(freq_1), FUN = function(k){grep(pattern = paste0("^", k, "[[:space:]]+"), 
+                                                  x = rownames(freq_2))})
 
 ### Compute the log frequency for each continuation, and then save
-bigramconts <- matrix(data = 0, nrow = length(monograms), ncol = length(monograms))
+bigramconts <- matrix(data = 0, nrow = length(freq_1), ncol = length(freq_1))
 
-for(i in 1:length(monograms)){
-        bigramconts[i, hits[[i]]] <- sapply(X = hits[[i]], FUN = function(k){
-                length(grep(pattern = paste0("[[:space:]]+", monograms[k], "$"), x = bigrams))
+for(i in 1:length(freq_1)){
+        
+        bigramconts[i] <- sapply(X = rownames(freq_1), FUN = function(k){
+                # Temporarily store a subset of the frequency counts
+                temp_freq <- freq_2[hits[[i]]]
+                
+                # Find the location of the matches for a given word
+                loc <- grep(pattern = paste0("[[:space:]]+", k, "$"),
+                     x = rownames(temp_freq))
+                
+                # Pull the frequency for that word if found, 0 otherwise
+                if(length(loc) > 0) output <- temp_freq[loc]
+                else output <- 0
         }, USE.NAMES = FALSE)
 }
 
