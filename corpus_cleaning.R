@@ -20,7 +20,7 @@ texts <- lapply(X = texts, function(x){sample(x, size = ceiling(pcnt*length(x)/1
 # Start cleaning the texts
 ## Remove all non-Eng chars, digits, and punctuation except for ' and -
 texts <- lapply(X = texts, FUN = gsub, pattern = "[^[:alpha:][:space:]'-]",
-                replacement = "", ignore.case = TRUE)
+                replacement = " ", ignore.case = TRUE)
 
 ## Remove all webaddresses
 texts <- lapply(X = texts, FUN = gsub, pattern = "((http|w{3}).*?(com|edu|org| ))",
