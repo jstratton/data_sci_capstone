@@ -52,8 +52,11 @@ freq_1 <- freq_1[freq_1 > 200]
 V <- rownames(freq_1)
 
 ### Toeknize the bigram and trigram strings
-bigrams <- unlist(strsplit(as.character(rownames(freq_2)), "[[:space:]]+"))
-trigrams <- unlist(strsplit(as.character(rownames(freq_3)), "[[:space:]]+"))
+bigrams <- sapply(X = strsplit(as.character(rownames(freq_2)), "[[:space:]]+"),
+                  FUN = unlist)
+
+trigrams <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
+                  FUN = unlist)
 
 ### Determine whether the components of an n-gram appear in V
 validate_ngrams <- function(ngrams){
@@ -67,4 +70,43 @@ validate_ngrams <- function(ngrams){
 freq_2 <- freq_2[validate_ngrams(bigrams)]
 freq_3 <- freq_3[validate_ngrams(trigrams)]
 
+# Save the character strings for all of the surviving n-grams
+write.table(rownames(freq_1), 
+            file = paste0(getwd(), "/saved_models/simple_kneser_ney/monograms.txt"))
 
+write.table(rownames(freq_2), 
+            file = paste0(getwd(), "/saved_models/simple_kneser_ney/bigrams.txt"))
+
+write.table(rownames(freq_3), 
+            file = paste0(getwd(), "/saved_models/simple_kneser_ney/trigrams.txt"))
+
+# Build count tables for bigrams and trigrams for later use
+### Tokenize the n-grams (again)
+bigrams <- sapply(X = strsplit(as.character(rownames(freq_2)), "[[:space:]]+"),
+                  FUN = unlist)
+
+trigrams <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
+                   FUN = unlist)
+
+### Map the bigram counts into a VxV matrix
+hits <- lapply(X = V, FUN = function(monogram){
+        # We only need to find the matches for the first word in the bigram
+        which(bigrams[,1] %in% monogram)
+})
+
+bigram_counts <- sapply(X = hits, FUN = function(h){
+        # Temporarily store a subset of the frequency counts
+        temp_freq <- freq_2[h]
+        # We only want the second word of each match
+        temp_bigrams <- bigrams[h,2]
+        
+        sapply(X = V, FUN = function(k){
+                # Find the location of the matches for a given continuation
+                loc <- which(temp_bigrams %in% k)
+                
+                # Pull the frequency for that word if found, 0 otherwise
+                if(length(loc) > 0) output <- temp_freq[loc]
+                else output <- 0
+        }, USE.NAMES = FALSE)
+        
+}, USE.NAMES = FALSE)
