@@ -65,6 +65,12 @@ write.table(rownames(freq_3),
 ## 1-gram word log-probability table
 prob_1 <- log(freq_1) - log(sum(freq_1))
 
+## Write the 1-gram probabilities to the disk
+write.table(prob_1, 
+            file = paste0(getwd(), "/saved_models/laplace_smoothed/monogramprobs.txt"),
+            row.names = FALSE, col.names = FALSE)
+
+
 ## 2-gram word log-probability table
 
 ### Find every entry of freq_2 beginning with the i-th ngram
