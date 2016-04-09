@@ -52,10 +52,10 @@ freq_1 <- freq_1[freq_1 > 200]
 V <- rownames(freq_1)
 
 ### Toeknize the bigram and trigram strings
-bigrams <- sapply(X = strsplit(as.character(rownames(freq_2)), "[[:space:]]+"),
+bigrams <- lapply(X = strsplit(as.character(rownames(freq_2)), "[[:space:]]+"),
                   FUN = unlist)
 
-trigrams <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
+trigrams <- lapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
                   FUN = unlist)
 
 ### Determine whether the components of an n-gram appear in V
@@ -82,27 +82,54 @@ write.table(rownames(freq_3),
 
 # Build count tables for bigrams and trigrams for later use
 ### Tokenize the n-grams (again)
-bigrams <- sapply(X = strsplit(as.character(rownames(freq_2)), "[[:space:]]+"),
+bigrams <- lapply(X = strsplit(as.character(rownames(freq_2)), "[[:space:]]+"),
                   FUN = unlist)
 
-trigrams <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
+trigrams <- lapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
                    FUN = unlist)
 
 ### Map the bigram counts into a VxV matrix
 hits <- lapply(X = V, FUN = function(monogram){
         # We only need to find the matches for the first word in the bigram
-        which(bigrams[,1] %in% monogram)
+        sapply(X = bigrams, FUN = function(bi){
+                which(bi[1] %in% monogram, arr.ind = TRUE)
+        })
 })
 
 bigram_counts <- sapply(X = hits, FUN = function(h){
         # Temporarily store a subset of the frequency counts
         temp_freq <- freq_2[h]
         # We only want the second word of each match
-        temp_bigrams <- bigrams[h,2]
+        temp_bigrams <- bigrams[[h]][2]
         
         sapply(X = V, FUN = function(k){
                 # Find the location of the matches for a given continuation
-                loc <- which(temp_bigrams %in% k)
+                loc <- which(temp_bigrams %in% k, arr.ind = TRUE)
+                
+                # Pull the frequency for that word if found, 0 otherwise
+                if(length(loc) > 0) output <- temp_freq[loc]
+                else output <- 0
+        }, USE.NAMES = FALSE)
+        
+}, USE.NAMES = FALSE)
+
+### Map the trigram counts into another table
+hits <- lapply(X = bigrams, FUN = function(bi){
+        # We only need to find the matches for the first 2 words in the trigram
+        sapply(X = trigrams, FUN = function(tri){
+                which(tri[1:2] %in% bi, arr.ind = TRUE)
+        })
+})
+
+trigram_counts <- sapply(X = hits, FUN = function(h){
+        # Temporarily store a subset of the frequency counts
+        temp_freq <- freq_3[h]
+        # We only want the last word of each trigram here
+        temp_trigrams <- trigrams[[h]][3]
+        
+        sapply(X = V, FUN = function(k){
+                # Find the location of the matches for a given continuation
+                loc <- which(temp_trigrams %in% k, arr.ind = TRUE)
                 
                 # Pull the frequency for that word if found, 0 otherwise
                 if(length(loc) > 0) output <- temp_freq[loc]
