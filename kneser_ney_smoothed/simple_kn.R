@@ -1,6 +1,6 @@
 # This file contains code to build a text filling model.
 # Simple Kneser-Ney smoothing with D = 0.75 was used.
-# For the sake of processing time, I chose V : Freq(w_i) > 200
+# For the sake of processing time, I chose V : Freq(w_i) > 45
 # I decided to build a trigram model
 
 # Load req libraries
@@ -83,6 +83,7 @@ write.table(rownames(freq_3),
             file = paste0(getwd(), "/saved_models/simple_kneser_ney/trigrams.txt"))
 
 # Build count tables for bigrams and trigrams for later use
+# Table structure: columns are the preceding words, rows are the completions
 ### Tokenize the n-grams (again)
 bigrams <- sapply(X = strsplit(as.character(rownames(freq_2)), "[[:space:]]+"),
                   FUN = unlist)
@@ -139,3 +140,45 @@ trigram_counts <- apply(X = hits, MARGIN = 2, FUN = function(h){
         }, USE.NAMES = FALSE)
         
 })
+
+# Simple Kneser Ney Smoothing
+## Monograms
+### Find the number of bigrams actually observed in the data
+N_bigrams <- sum(bigram_counts > 0)
+pkn_monograms <- apply(X = bigram_counts, MARGIN = 1, function(x){
+        sum(x > 0)/N_bigrams
+})
+
+## Bigrams
+D = 0.75
+
+### Find the number of counts each preceding word has associated with it
+proceding_counts <- apply(X = bigram_counts, MARGIN = 2, FUN = sum)
+
+### Find the number of possible completions for a given history
+num_completions <- apply(X = bigram_counts, MARGIN = 2, FUN = function(x){
+        sum(x > 0)})
+        
+pkn_bigrams <- apply(X = bigram_counts, MARGIN = 1, function(completion){
+        psmooth <- sum(completion > 0)/N_bigrams
+                
+        sapply(X = completion, function(history){
+                alpha <- max(history - D,0)/
+                gamma <- D
+                        
+                alpha + gamma*psmooth
+        })
+})
+
+### Build the pkn bigram table
+pkn_bigrams <- matrix(data = 0, nrow = length(V), ncol = length(V))
+for(i in 1:length(V)){
+        p_smooth <- pkn_monograms[i]
+        
+        for(j in 1:length(V)){
+                alpha <- max(bigram_counts[i,j] - D, 0)/proceding_counts[j]
+                gamma <- D*num_completions[j]/proceding_counts[j]
+                
+                pkn_bigrams[i,j] <- alpha + gamma*p_smooth
+        }
+}
