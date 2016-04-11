@@ -63,8 +63,8 @@ trigrams <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
 ### Determine whether the components of an n-gram appear in V
 validate_ngrams <- function(ngrams){
         apply(X = ngrams, MARGIN = 2, FUN = function(words){
-                # Return false if even one word is outside of V
-                all(words %in% V)
+                # Check each word and return false if even one word is outside of V
+                all(sapply(X = words, FUN = function(x){x %in% V}))
         })
 }
 
@@ -92,28 +92,18 @@ trigrams <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
                    FUN = unlist)
 
 ### Map the bigram counts into a VxV matrix
-hits <- lapply(X = V, FUN = function(monogram){
-        # We only need to find the matches for the first word in the bigram
-        apply(X = bigrams, MARGIN = 2, FUN = function(bi){
-                bi[1] %in% monogram
-        })
-})
 
-bigram_counts <- sapply(X = hits, FUN = function(h){
-        # Temporarily store a subset of the frequency counts
-        temp_freq <- freq_2[h]
-        # We only want the second word of each match
-        temp_bigrams <- bigrams[2,h]
+bigram_counts <- sapply(X = V, FUN = function(first){
+        # Check each bigram to see if the first term matches the current term
+        hits <- bigrams[1,] %in% first
         
-        sapply(X = V, FUN = function(k){
-                # Find the location of the matches for a given continuation
-                loc <- which(temp_bigrams %in% k, arr.ind = TRUE)
+        sapply(X = V, function(second){
+                # Check to see if the second term matches the second bigram
+                hits <- hits & (bigrams[2,] %in% second)
                 
-                # Pull the frequency for that word if found, 0 otherwise
-                if(length(loc) > 0) output <- temp_freq[loc]
-                else output <- 0
+                # Return the frequency for that bigram
+                ifelse(any(hits), yes = freq_2[which(hits, arr.ind = TRUE)], no = 0)
         }, USE.NAMES = FALSE)
-        
 }, USE.NAMES = FALSE)
 
 ### Map the trigram counts into another table
@@ -159,26 +149,32 @@ proceding_counts <- apply(X = bigram_counts, MARGIN = 2, FUN = sum)
 num_completions <- apply(X = bigram_counts, MARGIN = 2, FUN = function(x){
         sum(x > 0)})
         
-pkn_bigrams <- apply(X = bigram_counts, MARGIN = 1, function(completion){
-        psmooth <- sum(completion > 0)/N_bigrams
-                
-        sapply(X = completion, function(history){
-                alpha <- max(history - D,0)/
-                gamma <- D
-                        
-                alpha + gamma*psmooth
-        })
-})
+# pkn_bigrams <- apply(X = bigram_counts, MARGIN = 1, function(completion){
+#         psmooth <- sum(completion > 0)/N_bigrams
+#                 
+#         sapply(X = completion, function(history){
+#                 alpha <- max(history - D,0)/
+#                 gamma <- D
+#                         
+#                 alpha + gamma*psmooth
+#         })
+# })
 
 ### Build the pkn bigram table
 pkn_bigrams <- matrix(data = 0, nrow = length(V), ncol = length(V))
 for(i in 1:length(V)){
         p_smooth <- pkn_monograms[i]
         
-        for(j in 1:length(V)){
-                alpha <- max(bigram_counts[i,j] - D, 0)/proceding_counts[j]
-                gamma <- D*num_completions[j]/proceding_counts[j]
-                
-                pkn_bigrams[i,j] <- alpha + gamma*p_smooth
-        }
+        helper <- cbind(bigram_counts[i,], num_completions, proceding_counts)
+        
+        pkn_bigrams[i,] <- apply(X = helper, MARGIN = 1, function(x){
+                max(x[1] - D, 0)/x[3] + D*x[2]*p_smooth/x[3]
+        })
+        
+#         for(j in 1:length(V)){
+#                 alpha <- max(bigram_counts[i,j] - D, 0)/proceding_counts[j]
+#                 gamma <- D*num_completions[j]/proceding_counts[j]
+#                 
+#                 pkn_bigrams[i,j] <- alpha + gamma*p_smooth
+#         }
 }
