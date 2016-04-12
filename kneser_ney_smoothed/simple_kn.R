@@ -45,8 +45,11 @@ freq_1 <- sort(x = freq_1, decreasing = TRUE)
 freq_2 <- sort(x = freq_2, decreasing = TRUE)
 freq_3 <- sort(x = freq_3, decreasing = TRUE)
 
-# For the sake of processing time, I only use n-grams with freq > 45
+# For the sake of processing time, I only use 1-grams with freq > 45
 freq_1 <- freq_1[freq_1 > 45]
+# Remove any singlet entries from the bigram and trigams
+freq_2 <- freq_2[freq_2 > 45]
+freq_3 <- freq_3[freq_3 > 45]
 
 # Only include n-grams composed of the terms in our vocabulary
 V <- rownames(freq_1)
@@ -99,20 +102,24 @@ trigrams <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
                    FUN = unlist)
 
 ### Map the bigram counts into a VxV matrix
+### Find the bigrams whose first term matches a given vocabulary term
+hits <- sapply(X = V, FUN = function(first){bigrams[1,] %in% first})
 
-bigram_counts <- sapply(X = V, FUN = function(first){
-        # Check each bigram to see if the first term matches the current term
-        hits <- bigrams[1,] %in% first
+bigram_counts <- apply(X = hits, MARGIN = 2, FUN = function(h){
+        # Limit the bigram counts to the ones that match the first term
+        freq_2_lim <- freq_2[h]
+        # Subset the bigrams to only include ones that had a first term match
+        temp_completions <- bigrams[2,h]
         
         sapply(X = V, function(second){
-                # Check to see if the second term matches the second bigram
-                temp_hits <- hits & (bigrams[2,] %in% second)
+                # Check the second terms iff the first term matches
+                temp_hits <- temp_completions %in% second
                 
                 # Return the frequency for that bigram, if detected
-                ifelse(any(temp_hits), yes = freq_2[which(temp_hits, arr.ind = TRUE)],
+                ifelse(any(temp_hits), yes = freq_2_lim[which(temp_hits, arr.ind = TRUE)],
                        no = 0)
         }, USE.NAMES = FALSE)
-}, USE.NAMES = FALSE)
+})
 
 ### Map the trigram counts into another table
 hits <- apply(X = bigrams, MARGIN = 2, FUN = function(bi){
