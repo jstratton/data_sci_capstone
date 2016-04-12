@@ -47,8 +47,6 @@ freq_3 <- sort(x = freq_3, decreasing = TRUE)
 
 # For the sake of processing time, I only use n-grams with freq > 45
 freq_1 <- freq_1[freq_1 > 45]
-freq_2 <- freq_2[freq_2 > 45]
-freq_3 <- freq_3[freq_3 > 45]
 
 # Only include n-grams composed of the terms in our vocabulary
 V <- rownames(freq_1)
@@ -63,8 +61,17 @@ trigrams <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
 ### Determine whether the components of an n-gram appear in V
 validate_ngrams <- function(ngrams){
         apply(X = ngrams, MARGIN = 2, FUN = function(words){
-                # Check each word and return false if even one word is outside of V
-                all(sapply(X = words, FUN = function(x){x %in% V}))
+                # Initialize a logical value to determine whether a ngram is valid
+                in_vocabulary <- TRUE
+                i <- 1
+                
+                # Check each word but return false once an OoV word is found
+                while(i <= length(words) & in_vocabulary){
+                        in_vocabulary <- words[i] %in% V
+                        i <- i + 1
+                }
+                
+                in_vocabulary
         })
 }
 
@@ -99,10 +106,11 @@ bigram_counts <- sapply(X = V, FUN = function(first){
         
         sapply(X = V, function(second){
                 # Check to see if the second term matches the second bigram
-                hits <- hits & (bigrams[2,] %in% second)
+                temp_hits <- hits & (bigrams[2,] %in% second)
                 
-                # Return the frequency for that bigram
-                ifelse(any(hits), yes = freq_2[which(hits, arr.ind = TRUE)], no = 0)
+                # Return the frequency for that bigram, if detected
+                ifelse(any(temp_hits), yes = freq_2[which(temp_hits, arr.ind = TRUE)],
+                       no = 0)
         }, USE.NAMES = FALSE)
 }, USE.NAMES = FALSE)
 
