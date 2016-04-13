@@ -103,21 +103,22 @@ trigrams <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
 
 ### Map the bigram counts into a VxV matrix
 ### Find the bigrams whose first term matches a given vocabulary term
-hits <- sapply(X = V, FUN = function(first){bigrams[1,] %in% first})
+hits <- lapply(X = V, FUN = function(first){
+        which(bigrams[1,] %in% first, arr.ind = TRUE)
+})
 
-bigram_counts <- apply(X = hits, MARGIN = 2, FUN = function(h){
+bigram_counts <- sapply(X = hits, FUN = function(h){
         # Limit the bigram counts to the ones that match the first term
         freq_2_lim <- freq_2[h]
         # Subset the bigrams to only include ones that had a first term match
         temp_completions <- bigrams[2,h]
         
         sapply(X = V, function(second){
-                # Check the second terms iff the first term matches
-                temp_hits <- temp_completions %in% second
+                # Find the index of the word that completes the bigram, if any
+                loc <- which(temp_completions %in% second, arr.ind = TRUE)
                 
                 # Return the frequency for that bigram, if detected
-                ifelse(any(temp_hits), yes = freq_2_lim[which(temp_hits, arr.ind = TRUE)],
-                       no = 0)
+                ifelse(length(loc) > 0, yes = freq_2_lim[loc], no = 0)
         }, USE.NAMES = FALSE)
 })
 
