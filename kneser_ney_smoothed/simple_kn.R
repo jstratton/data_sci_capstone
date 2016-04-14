@@ -45,11 +45,11 @@ freq_1 <- sort(x = freq_1, decreasing = TRUE)
 freq_2 <- sort(x = freq_2, decreasing = TRUE)
 freq_3 <- sort(x = freq_3, decreasing = TRUE)
 
-# For the sake of processing time, I only use 1-grams with freq > 45
-freq_1 <- freq_1[freq_1 > 45]
-# Remove any singlet entries from the bigram and trigams
-freq_2 <- freq_2[freq_2 > 45]
-freq_3 <- freq_3[freq_3 > 45]
+# For the sake of processing time, I only use 1-grams with freq > 50
+freq_1 <- freq_1[freq_1 > 50]
+# Remove any infrequent entries from the bigrams and trigams
+freq_2 <- freq_2[freq_2 > 5]
+freq_3 <- freq_3[freq_3 > 5]
 
 # Only include n-grams composed of the terms in our vocabulary
 V <- rownames(freq_1)
@@ -69,7 +69,7 @@ validate_ngrams <- function(ngrams){
                 i <- 1
                 
                 # Check each word but return false once an OoV word is found
-                while(i <= length(words) & in_vocabulary){
+                while(in_vocabulary & i <= length(words) ){
                         in_vocabulary <- words[i] %in% V
                         i <- i + 1
                 }
@@ -120,7 +120,7 @@ bigram_counts <- sapply(X = hits, FUN = function(h){
                 # Return the frequency for that bigram, if detected
                 ifelse(length(loc) > 0, yes = freq_2_lim[loc], no = 0)
         }, USE.NAMES = FALSE)
-})
+}, USE.NAMES = FALSE)
 
 ### Map the trigram counts into another table
 hits <- apply(X = bigrams, MARGIN = 2, FUN = function(bi){
