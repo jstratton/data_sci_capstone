@@ -7,26 +7,30 @@
 library(tm)
 library(RWeka)
 library(SnowballC)
+library(data.table)
 
 # Load the sample corpus using the tm package
-docs <- DirSource(directory = paste0(getwd(), "/samples/compiled/"))
+docs <- DirSource(directory = paste0(getwd(), "/samples/compiled/"), encoding = "UTF-8")
 texts <- VCorpus(docs)
 
 # Strip the whitespace from the documents
 texts <- tm_map(texts, stripWhitespace)
 
 # Find the 1-gram frequencies
-strsplit_space_tokenizer <- function(x)
+strsplit_space_tokenizer <- function(x){
         unlist(strsplit(as.character(x), "[[:space:]]+"))
+}
 
-# Set the parameters for termFreq
-ctrl <- list(tokenize = strsplit_space_tokenizer, tolower = FALSE)
+ctrl <- list(tokenize = strsplit_space_tokenizer, tolower = FALSE,
+             wordLengths = c(1, Inf))
 
 freq_1 <- termFreq(doc = texts[[1]], control = ctrl)
 
 # Find the 2-gram frequencies
 bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 2, 
                                                               delimiters = " \n"))}
+
+bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 2))}
 
 ctrl <- list(tokenize = bigramtokenizer, tolower = FALSE)
 
@@ -40,10 +44,33 @@ ctrl <- list(tokenize = trigramtokenizer, tolower = FALSE)
 
 freq_3 <- termFreq(doc = texts[[1]], control = ctrl)
 
-# Sort the frequencies
-freq_1 <- sort(x = freq_1, decreasing = TRUE)
-freq_2 <- sort(x = freq_2, decreasing = TRUE)
-freq_3 <- sort(x = freq_3, decreasing = TRUE)
+# Store the term frequencies in data tables
+monograms <- data.table(word = rownames(freq_1), mono_freq = freq_1)
+setkey(monograms, mono_freq)
+
+# Split apart the phrases and store them in the bigram data table
+phrases <- sapply(X = strsplit(as.character(rownames(freq_2)), "[[:space:]]+"),
+                  FUN = unlist)
+
+bigrams <- data.table(big_first = phrases[1,], big_second = phrases[2,],
+                      big_freq = freq_2)
+
+# Split apart the trigram phrases and store them in the trigram data table
+phrases <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
+                  FUN = unlist)
+
+trigrams <- data.table(tri_first = phrases[1,], tri_second = phrases[2,],
+                       tri_third = phrases[3,], tri_freq = freq_3)
+
+# Create a numeric word key to monograms
+monograms[,map := 1:length(freq_1)]
+
+# Map the constituent words onto the numeric key
+setkey(monograms, word) # Set monogram's key to words to enable binary searching
+
+# Replace each word with the corresponding key
+bigrams[, `:=` (keyed_first = monograms[big_first, map],
+                keyed_second = monograms[big_second, map])]
 
 # For the sake of processing time, I only use 1-grams with freq > 50
 freq_1 <- freq_1[freq_1 > 50]
