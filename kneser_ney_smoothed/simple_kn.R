@@ -30,9 +30,8 @@ freq_1 <- termFreq(doc = texts[[1]], control = ctrl)
 bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 2, 
                                                               delimiters = " \n"))}
 
-bigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 2, max = 2))}
-
-ctrl <- list(tokenize = bigramtokenizer, tolower = FALSE)
+ctrl <- list(tokenize = bigramtokenizer, tolower = FALSE,
+             wordLengths = c(1, Inf))
 
 freq_2 <- termFreq(doc = texts[[1]], control = ctrl)
 
@@ -40,7 +39,8 @@ freq_2 <- termFreq(doc = texts[[1]], control = ctrl)
 trigramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 3, max = 3,
                                                                delimiters = " \n"))}
 
-ctrl <- list(tokenize = trigramtokenizer, tolower = FALSE)
+ctrl <- list(tokenize = trigramtokenizer, tolower = FALSE,
+             wordLengths = c(1, Inf))
 
 freq_3 <- termFreq(doc = texts[[1]], control = ctrl)
 
