@@ -77,41 +77,22 @@ trigrams[, `:=` (tri_first = monograms[tri_first, map],
                  tri_third = monograms[tri_third, map])]
 
 # For the sake of processing time, I only use 1-grams with freq > 50
-freq_1 <- freq_1[freq_1 > 50]
-# Remove any infrequent entries from the bigrams and trigams
-freq_2 <- freq_2[freq_2 > 5]
-freq_3 <- freq_3[freq_3 > 5]
+setkey(monograms, mono_freq)
+monograms <- monograms[mono_freq > 50]
+
+# Sort the bigram and trigram tables by word
+setkey(bigrams, big_first, big_second)
+setkey(trigrams, tri_first, tri_second, tri_third)
 
 # Only include n-grams composed of the terms in our vocabulary
-V <- rownames(freq_1)
+bigrams <- bigrams[big_first > monograms[,min(map) - 1]
+                        & big_second > monograms[,min(map) - 1]
+                  ]
 
-### Toeknize the bigram and trigram strings
-bigrams <- sapply(X = strsplit(as.character(rownames(freq_2)), "[[:space:]]+"),
-                  FUN = unlist)
-
-trigrams <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
-                  FUN = unlist)
-
-### Determine whether the components of an n-gram appear in V
-validate_ngrams <- function(ngrams){
-        apply(X = ngrams, MARGIN = 2, FUN = function(words){
-                # Initialize a logical value to determine whether a ngram is valid
-                in_vocabulary <- TRUE
-                i <- 1
-                
-                # Check each word but return false once an OoV word is found
-                while(in_vocabulary & i <= length(words) ){
-                        in_vocabulary <- words[i] %in% V
-                        i <- i + 1
-                }
-                
-                in_vocabulary
-        })
-}
-
-### Eliminate any 2 and 3-grams with OOV words
-freq_2 <- freq_2[validate_ngrams(bigrams)]
-freq_3 <- freq_3[validate_ngrams(trigrams)]
+trigrams <- trigrams[tri_first > monograms[,min(map) - 1]
+                        & tri_second > monograms[,min(map) - 1]
+                        & tri_third > monograms[,min(map) - 1]
+                    ]
 
 # Save the character strings for all of the surviving n-grams
 write.table(rownames(freq_1), 
