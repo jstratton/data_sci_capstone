@@ -51,15 +51,18 @@ monograms <- data.table(word = rownames(freq_1), mono_freq = freq_1)
 phrases <- sapply(X = strsplit(as.character(rownames(freq_2)), "[[:space:]]+"),
                   FUN = unlist)
 
-bigrams <- data.table(big_first = phrases[1,], big_second = phrases[2,],
+bigrams <- data.table(big_first = phrases[1,],
+                      big_second = phrases[2,],
                       big_freq = freq_2)
 
 # Split apart the trigram phrases and store them in the trigram data table
 phrases <- sapply(X = strsplit(as.character(rownames(freq_3)), "[[:space:]]+"),
                   FUN = unlist)
 
-trigrams <- data.table(tri_first = phrases[1,], tri_second = phrases[2,],
-                       tri_third = phrases[3,], tri_freq = freq_3)
+trigrams <- data.table(tri_first = phrases[1,],
+                       tri_second = phrases[2,],
+                       tri_third = phrases[3,],
+                       tri_freq = freq_3)
 
 # Create a numeric word key to monograms
 setkey(monograms, mono_freq)
@@ -84,7 +87,7 @@ monograms <- monograms[mono_freq > 50]
 setkey(bigrams, big_first, big_second)
 setkey(trigrams, tri_first, tri_second, tri_third)
 
-# Only include n-grams composed of the terms in our vocabulary
+# Restrict n-grams to terms in our vocabulary
 bigrams <- bigrams[big_first > monograms[,min(map) - 1]
                         & big_second > monograms[,min(map) - 1]
                   ]
