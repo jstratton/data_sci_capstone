@@ -73,11 +73,13 @@ setkey(monograms, word) # Set monogram's key to words to enable binary searching
 
 # Replace each word with the corresponding key
 bigrams[, `:=` (big_first = monograms[big_first, map],
-                big_second = monograms[big_second, map])]
+                big_second = monograms[big_second, map])
+        ]
 
 trigrams[, `:=` (tri_first = monograms[tri_first, map],
                  tri_second = monograms[tri_second, map],
-                 tri_third = monograms[tri_third, map])]
+                 tri_third = monograms[tri_third, map])
+         ]
 
 # For the sake of processing time, I only use 1-grams with freq > 50
 setkey(monograms, mono_freq)
@@ -97,15 +99,15 @@ trigrams <- trigrams[tri_first > monograms[,min(map) - 1]
                         & tri_third > monograms[,min(map) - 1]
                     ]
 
-# Save the character strings for all of the surviving n-grams
-write.table(rownames(freq_1), 
-            file = paste0(getwd(), "/saved_models/simple_kneser_ney/monograms.txt"))
+# Save the n-gram tables
+write.table(monograms, 
+            file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_monograms.txt"))
 
-write.table(rownames(freq_2), 
-            file = paste0(getwd(), "/saved_models/simple_kneser_ney/bigrams.txt"))
+write.table(bigrams, 
+            file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_bigrams.txt"))
 
-write.table(rownames(freq_3), 
-            file = paste0(getwd(), "/saved_models/simple_kneser_ney/trigrams.txt"))
+write.table(trigrams, 
+            file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_trigrams.txt"))
 
 # Build count tables for bigrams and trigrams for later use
 # Table structure: columns are the preceding words, rows are the completions
