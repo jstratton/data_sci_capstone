@@ -101,10 +101,13 @@ trigrams <- trigrams[tri_first > monograms[,min(map) - 1]
 
 # Save the n-gram tables
 write.table(monograms, 
-            file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_monograms.txt"))
+            file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_monograms.txt"),
+            row.names = FALSE)
 
 write.table(bigrams, 
-            file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_bigrams.txt"))
+            file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_bigrams.txt"),
+            row.names = FALSE)
 
 write.table(trigrams, 
-            file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_trigrams.txt"))
+            file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_trigrams.txt"),
+            row.names = FALSE)
