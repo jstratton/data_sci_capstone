@@ -48,7 +48,7 @@ freq_3 <- termFreq(doc = texts[[1]], control = ctrl)
 tetragramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 4, max = 4,
                                                                delimiters = " \n"))}
 
-ctrl <- list(tokenize = trigramtokenizer, tolower = FALSE,
+ctrl <- list(tokenize = tetragramtokenizer, tolower = FALSE,
              wordLengths = c(1, Inf))
 
 freq_4 <- termFreq(doc = texts[[1]], control = ctrl)
@@ -113,6 +113,7 @@ monograms <- monograms[mono_freq > 50]
 # Sort the bigram and trigram tables by word
 setkey(bigrams, big_first, big_second)
 setkey(trigrams, tri_first, tri_second, tri_third)
+setkey(tetragrams, tetra_first, tetra_second, tetra_third, tetra_fourth)
 
 # Restrict n-grams to terms in our vocabulary
 bigrams <- bigrams[big_first > monograms[,min(map) - 1]
@@ -123,6 +124,12 @@ trigrams <- trigrams[tri_first > monograms[,min(map) - 1]
                         & tri_second > monograms[,min(map) - 1]
                         & tri_third > monograms[,min(map) - 1]
                     ]
+
+tetragrams <- tetragrams[tetra_first > monograms[,min(map) - 1]
+                     & tetra_second > monograms[,min(map) - 1]
+                     & tetra_third > monograms[,min(map) - 1]
+                     & tetra_fourth > monograms[,min(map) - 1]
+                     ]
 
 # Save the n-gram tables
 write.table(monograms, 
@@ -135,4 +142,8 @@ write.table(bigrams,
 
 write.table(trigrams, 
             file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_trigrams.txt"),
+            row.names = FALSE)
+
+write.table(tetragrams, 
+            file = paste0(getwd(), "/saved_models/simple_kneser_ney/KN_tetragrams.txt"),
             row.names = FALSE)
