@@ -44,6 +44,15 @@ ctrl <- list(tokenize = trigramtokenizer, tolower = FALSE,
 
 freq_3 <- termFreq(doc = texts[[1]], control = ctrl)
 
+# Find the 4-gram frequencies
+tetragramtokenizer <- function(x){NGramTokenizer(x, Weka_control(min = 4, max = 4,
+                                                               delimiters = " \n"))}
+
+ctrl <- list(tokenize = trigramtokenizer, tolower = FALSE,
+             wordLengths = c(1, Inf))
+
+freq_4 <- termFreq(doc = texts[[1]], control = ctrl)
+
 # Store the term frequencies in data tables
 monograms <- data.table(word = rownames(freq_1), mono_freq = freq_1)
 
@@ -64,6 +73,16 @@ trigrams <- data.table(tri_first = phrases[1,],
                        tri_third = phrases[3,],
                        tri_freq = freq_3)
 
+# Split apart the tetragram phrases and store them in the tetragram DT
+phrases <- sapply(X = strsplit(as.character(rownames(freq_4)), "[[:space:]]+"),
+                  FUN = unlist)
+
+tetragrams <- data.table(tetra_first = phrases[1,],
+                         tetra_second = phrases[2,],
+                         tetra_third = phrases[3,],
+                         tetra_fourth = phrases[4,],
+                         tetra_freq = freq_4)
+
 # Create a numeric word key to monograms
 setkey(monograms, mono_freq)
 monograms[,map := 1:length(freq_1)]
@@ -79,6 +98,12 @@ bigrams[, `:=` (big_first = monograms[big_first, map],
 trigrams[, `:=` (tri_first = monograms[tri_first, map],
                  tri_second = monograms[tri_second, map],
                  tri_third = monograms[tri_third, map])
+         ]
+
+tetragrams[, `:=` (tetra_first = monograms[tetra_first, map],
+                 tetra_second = monograms[tetra_second, map],
+                 tetra_third = monograms[tetra_third, map],
+                 tetra_fourth = monograms[tetra_fourth, map])
          ]
 
 # For the sake of processing time, I only use 1-grams with freq > 50
