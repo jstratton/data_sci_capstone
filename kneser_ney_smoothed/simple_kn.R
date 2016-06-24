@@ -106,9 +106,9 @@ tetragrams[, `:=` (tetra_first = monograms[tetra_first, map],
                  tetra_fourth = monograms[tetra_fourth, map])
          ]
 
-# For the sake of processing time, I only use 1-grams with freq > 50
+# For the sake of processing time, I only use 1-grams with freq > 5
 setkey(monograms, mono_freq)
-monograms <- monograms[mono_freq > 50]
+monograms <- monograms[mono_freq > 5]
 
 # Sort the bigram and trigram tables by word
 setkey(bigrams, big_first, big_second)

@@ -82,6 +82,10 @@ texts <- lapply(X = texts, FUN = gsub,
                 pattern = "(son[s]*)*.*?(of)*.*(a*).*(whore)+(s| )*",
                 replacement = "", ignore.case = TRUE)
 
+### Add the start of phrase and end of phrase tokens to the file(s).
+texts <- lapply(X = texts, FUN = gsub, pattern = "^", replacement = "<s> <s> ")
+texts <- lapply(X = texts, FUN = gsub, pattern = "$", replacement = "</s>")
+
 # Save the text file
 output <- c(texts$blogs, texts$news, texts$twit)
 my_con = file(description = paste0(getwd(), "/samples/compiled/fulltext.txt"),
