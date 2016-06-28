@@ -8,7 +8,7 @@ library(SnowballC)
 # Load the txt files
 dir <- paste0(getwd(),"/final/en_US")
 
-texts <- list(blogs = readLines(con = paste0(dir, "/en_US.blogs.txt"),
+texts <- list(twit = readLines(con = paste0(dir, "/en_US.twitter.txt"),
                                 encoding = "UTF-8")
               )
 
@@ -82,13 +82,13 @@ texts <- lapply(X = texts, FUN = gsub,
                 pattern = "(son[s]*)*.*?(of)*.*(a*).*(whore)+(s| )*",
                 replacement = "", ignore.case = TRUE)
 
-### Add the start of phrase and end of phrase tokens to the file(s).
-texts <- lapply(X = texts, FUN = gsub, pattern = "^", replacement = "<s> <s> ")
-texts <- lapply(X = texts, FUN = gsub, pattern = "$", replacement = "</s>")
+### Add the start of phrase tokens to the file.
+texts <- lapply(X = texts, FUN = gsub, pattern = "^", replacement = "<S> <S> ")
 
 # Save the text file
 output <- c(texts$blogs, texts$news, texts$twit)
-my_con = file(description = paste0(getwd(), "/samples/compiled/fulltext.txt"),
+my_con = file(description = paste0(getwd(), "kneser_ney_smoothed_2/",
+                                   "twitter_corpus/twit_corp.txt"),
               encoding = "UTF-8")
 writeLines(output, con = my_con)
 
