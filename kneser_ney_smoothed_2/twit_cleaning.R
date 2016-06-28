@@ -13,8 +13,8 @@ texts <- list(twit = readLines(con = paste0(dir, "/en_US.twitter.txt"),
               )
 
 # I've chosen to use a sample size of 5% for the sake of processing time
-pcnt <- 5
-set.seed(3252016)
+pcnt <- 60
+set.seed(6282016)
 texts <- lapply(X = texts, function(x){sample(x, size = ceiling(pcnt*length(x)/100))})
 
 # Start cleaning the texts
@@ -86,10 +86,9 @@ texts <- lapply(X = texts, FUN = gsub,
 texts <- lapply(X = texts, FUN = gsub, pattern = "^", replacement = "<S> <S> ")
 
 # Save the text file
-output <- c(texts$blogs, texts$news, texts$twit)
-my_con = file(description = paste0(getwd(), "kneser_ney_smoothed_2/",
-                                   "twitter_corpus/twit_corp.txt"),
+my_con = file(description = paste0(getwd(), "/kneser_ney_smoothed_2",
+                                   "/twitter_corpus", "/twit_corp.txt"),
               encoding = "UTF-8")
-writeLines(output, con = my_con)
+writeLines(texts$twit, con = my_con)
 
 close(my_con)
