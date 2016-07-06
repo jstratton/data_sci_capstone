@@ -12,8 +12,10 @@ texts <- list(twit = readLines(con = paste0(dir, "/en_US.twitter.txt"),
                                 encoding = "UTF-8")
               )
 
+# Remove the repeats?
+
 # I've chosen to use a sample size of 5% for the sake of processing time
-pcnt <- 60
+pcnt <- 10
 set.seed(6282016)
 texts <- lapply(X = texts, function(x){sample(x, size = ceiling(pcnt*length(x)/100))})
 
