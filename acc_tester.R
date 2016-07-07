@@ -9,5 +9,30 @@ texts <- list(twit = readLines(con = paste0(dir, "/en_US.twitter.txt"),
                                encoding = "UTF-8")
 )
 
-# Remove the samples that were included in the training set
+texts <- unlist(texts)
 
+# Remove the samples that were included in the training set
+pcnt <- 10
+set.seed(6282016)
+ind <- sample.int(n = length(texts), size = ceiling(pcnt*length(texts)/100))
+texts <- texts[-ind]
+
+# Take half (~45%) of the unused data as a test set
+pcnt <- 50
+ind <- sample.int(n = length(texts), size = ceiling(pcnt*length(texts)/100))
+texts <- texts[ind]
+
+# Convert the texts back into a list
+texts <- as.list(texts)
+
+# Tokenize the words
+texts <- lapply(X = texts, FUN = function(x){unlist(strsplit(as.character(x), "[[:space:]]+"))})
+
+# Use the preceding words as the input to the function, and the last word as the answer.
+questions <- lapply(texts, FUN = function(x){x[1:(length(x) - 1)]})
+answers <- lapply(texts, FUN = function(x){x[length(x)]})
+
+# Test the accuracy of a given model
+acc_test <- function(model = function(){"a"}){
+        
+}
