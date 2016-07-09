@@ -20,9 +20,8 @@ if(all(file.exists(paste0(dir, "/test_questions.txt"), paste0(dir, "/test_answer
         ind <- sample.int(n = length(texts), size = ceiling(pcnt*length(texts)/100))
         texts <- texts[-ind]
         
-        # Take half (~45%) of the unused data as a test set
-        pcnt <- 50
-        ind <- sample.int(n = length(texts), size = ceiling(pcnt*length(texts)/100))
+        # Take 500 phrases as a test set
+        ind <- sample.int(n = length(texts), size = 500)
         texts <- texts[ind]
         
         # Convert the texts into a list
