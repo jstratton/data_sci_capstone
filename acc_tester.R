@@ -14,6 +14,9 @@ if(all(file.exists(paste0(dir, "/test_questions.txt"), paste0(dir, "/test_answer
         texts <- readLines(con = paste0(dir, "/en_US.twitter.txt"),
                            encoding = "UTF-8")
         
+        # Restrict the test set to the unique phrases
+        texts <- unique(texts)
+        
         # Remove the samples that were included in the training set
         pcnt <- 10
         set.seed(6282016)
@@ -23,9 +26,6 @@ if(all(file.exists(paste0(dir, "/test_questions.txt"), paste0(dir, "/test_answer
         # Take 50 phrases as a test set
         inds <- sample.int(n = length(texts), size = 50)
         texts <- texts[inds]
-        
-        # Restrict the test set to the unique phrase
-        texts <- unique(texts)
         
         # Convert the texts into a list
         texts <- as.list(texts)
