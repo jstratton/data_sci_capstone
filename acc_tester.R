@@ -24,6 +24,9 @@ if(all(file.exists(paste0(dir, "/test_questions.txt"), paste0(dir, "/test_answer
         ind <- sample.int(n = length(texts), size = 500)
         texts <- texts[ind]
         
+        # Restrict the test set to the unique phrase
+        texts <- unique(texts)
+        
         # Convert the texts into a list
         texts <- as.list(texts)
         
@@ -102,6 +105,11 @@ if(all(file.exists(paste0(dir, "/test_questions.txt"), paste0(dir, "/test_answer
                         pattern = "(son[s]*)*.*?(of)*.*(a*).*(whore)+(s| )*",
                         replacement = "", ignore.case = TRUE)
         
+        # Trim the white space from the answer set
+        answers <- lapply(X = answers, FUN = gsub,
+                          pattern = "[[:space:]]",
+                          replacement = "", ignore.case = TRUE)
+        
         # Find the indices of the answers that are completely removed by cleaning
         inds <- sapply(X = answers, FUN = function(x){x == ""}, USE.NAMES = FALSE)
         inds <- which(inds)
@@ -134,6 +142,13 @@ if(all(file.exists(paste0(dir, "/test_questions.txt"), paste0(dir, "/test_answer
 }
 
 # Test the accuracy of a given model
-acc_test <- function(model = function(){"The"}){
+acc_test <- function(model = function(x){"The"}){
+        # Pass each question into the model and determine the model's answer
+        results <- sapply(X = test_phrases[,questions], FUN = model, USE.NAMES = FALSE)
         
+        # Determine the proportion of accurate guesses.
+        accuracy <- sum(test_phrases[, answers == results])
+        accuracy <- accuracy/test_phrases[,length(answers)]
+        
+        accuracy
 }
