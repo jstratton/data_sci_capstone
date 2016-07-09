@@ -31,9 +31,15 @@ bigram_model <- function(history){
                 P_KN0[, P0 := bigrams[, length(big_freq), keyby = big_second]$V1]
                 P_KN0[, P0 := P0/nrow(bigrams)]
                 
-                # Return the zero order probabilities
                 P_KN0[, P0 := log(P0)]
-                P_KN0[order(-P0)]
+                
+                # Sort the table by rank
+                rank <- order(P_KN0[, P0], decreasing = TRUE)
+                P_KN0 <- P_KN0[rank,]
+                
+                # Return the word corresponding to the top entry
+                setkey(monograms, map)
+                monograms[P_KN0[1, map], word]
         }
         else
         {
@@ -69,10 +75,13 @@ bigram_model <- function(history){
                 
                 P_KN2[, P2 := log(P2)] # Convert to log probs
                 
-                # Return the top completions
-                P_KN2 <- P_KN2[order(-P2)]
-                monograms[list(P_KN2[,head(completion)])]
-                #P_KN2[,head(P2)]
+                # Return the top completion
+                rank <- order(P_KN2[, P2], decreasing = TRUE)
+                P_KN2 <- P_KN2[rank,]
+                
+                # Return the word corresponding to the top entry
+                setkey(monograms, map)
+                monograms[P_KN2[1, map], word]
         }
 }
 
@@ -147,9 +156,13 @@ trigram_model <- function(history){
                 
                 P_KN3[, P3 := log(P3)] # Convert to log probs
                 
-                # Output a prediction
-                P_KN3 <- P_KN3[order(-P3)]
-                monograms[list(P_KN3[,head(completion3)])]
+                # Rank the different words based on probability
+                rank <- order(P_KN3[, P3], decreasing = TRUE)
+                P_KN3 <- P_KN3[rank,]
+                
+                # Return the word corresponding to the top entry
+                setkey(monograms, map)
+                monograms[P_KN3[1, map], word]
         }
 }
 
@@ -260,9 +273,13 @@ tetragram_model <- function(history){
                 
                 P_KN4[, P4 := log(P4)] # Convert to log probs
                 
-                ## Output a prediction
-                P_KN4 <- P_KN4[order(-P4)]
-                monograms[list(P_KN4[,head(completion4)])]
+                ## Rank the words
+                rank <- order(P_KN4[, P4], decreasing = TRUE)
+                P_KN0 <- P_KN4[rank,]
+                
+                # Return the word corresponding to the top entry
+                setkey(monograms, map)
+                monograms[P_KN4[1, map], word]
         }
 }
 
