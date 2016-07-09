@@ -81,7 +81,7 @@ bigram_model <- function(history){
                 
                 # Return the word corresponding to the top entry
                 setkey(monograms, map)
-                monograms[P_KN2[1, map], word]
+                monograms[P_KN2[1, completion], word]
         }
 }
 
@@ -162,7 +162,7 @@ trigram_model <- function(history){
                 
                 # Return the word corresponding to the top entry
                 setkey(monograms, map)
-                monograms[P_KN3[1, map], word]
+                monograms[P_KN3[1, completion3], word]
         }
 }
 
@@ -275,11 +275,11 @@ tetragram_model <- function(history){
                 
                 ## Rank the words
                 rank <- order(P_KN4[, P4], decreasing = TRUE)
-                P_KN0 <- P_KN4[rank,]
+                P_KN4 <- P_KN4[rank,]
                 
                 # Return the word corresponding to the top entry
                 setkey(monograms, map)
-                monograms[P_KN4[1, map], word]
+                monograms[P_KN4[1, completion4], word]
         }
 }
 
