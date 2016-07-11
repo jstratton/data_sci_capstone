@@ -86,7 +86,7 @@ texts <- lapply(X = texts, FUN = gsub,
                 replacement = "", ignore.case = TRUE)
 
 ### Add the start of phrase tokens to the file.
-texts <- lapply(X = texts, FUN = gsub, pattern = "^", replacement = "<S> <S> ")
+texts <- lapply(X = texts, FUN = gsub, pattern = "^", replacement = "<S> <S> <S> ")
 
 # Save the text file
 my_con = file(description = paste0(getwd(), "/kneser_ney_smoothed_2",

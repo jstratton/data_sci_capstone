@@ -14,7 +14,7 @@ if(all(file.exists(paste0(dir, "/test_questions.txt"), paste0(dir, "/test_answer
         texts <- readLines(con = paste0(dir, "/en_US.twitter.txt"),
                            encoding = "UTF-8")
         
-        # Restrict the test set to the unique phrases
+        # Restrict the test set to the unique phrases, to match the cleaning procedure
         texts <- unique(texts)
         
         # Remove the samples that were included in the training set
@@ -149,6 +149,8 @@ acc_test <- function(model = function(x){"The"}){
         # Determine the proportion of accurate guesses.
         accuracy <- sum(test_phrases[, answers == results])
         accuracy <- accuracy/test_phrases[,length(answers)]
+        
+        test_phrases[, outcome := results]
         
         accuracy
 }
