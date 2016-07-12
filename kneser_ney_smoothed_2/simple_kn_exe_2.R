@@ -293,6 +293,9 @@ word_guesser <- function(history = ""){
         history[, grams := gsub(x = grams, pattern = "[^[:alpha:][:space:]'-]", 
                                 replacement = "", ignore.case = TRUE)]
         
+        # Add the start of sentence markers to the history
+        history <- data.table(grams = c("<S>", "<S>", "<S>", history[, grams]))
+        
         # Convert each word to a numeric using the map
         setkey(monograms, word)
         history[, grams := monograms[list(grams), map]]
@@ -300,17 +303,6 @@ word_guesser <- function(history = ""){
         # Sort the monograms based on the map
         setkey(monograms, map)
         
-        # Use a tetragram model if we have a large history
-        if(nrow(history) > 2){
-                tetragram_model(history)
-        }
-        else{
-                if(nrow(history) > 1)
-                {
-                        trigram_model(history) # Use the trigram model if we have two words
-                }
-                else{
-                        bigram_model(history) # Use the bigram model if we only have 1 word
-                }
-        }
+        # Try the tetragram model to start
+        tetragram_model(history)
 }
