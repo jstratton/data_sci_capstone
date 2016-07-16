@@ -16,16 +16,24 @@ My Approach
 ========================================================
 
 - My app uses three word histories to predict future words.
-- I used a simple Kneser-Ney model to determine word probabilities.
-- Twitter data was used to train the model because the app is intended to complete short phrases.
-- If a given history was never observed in training, my model backs off to successively shorter histories.
+- I used a 3-gram Kneser-Ney model to determine word probabilities.
+- Stupid back off to lower order models was used to handle unobserved histories.
 - If none of the history was observed, the model returns the word observed to complete the most histories.
+- Twitter data was used for training because the app is intended to complete short phrases.
 
 Results
 ========================================================
 
-- The model predicts the user's exact word 15% of the time.
-- However, the app predicts logical continuations 80% of the time.
+- The app predicts the user's exact word 15% of the time.
+- However, the app predicts natural continuations 80% of the time.
 - Word history tables take up 136.6 MB of memory, or 100 MB when implemented as data tables.
 - For comparison, smartphones have RAM on the order of 2 to 4 GB.
-- Adapting this model to a smartphone shouldn't be a problem.
+
+![alt text](file:///C:/Users/James/data_sci_capstone/app_pitch-figure/app_pic.png)
+
+Conclusion
+===
+
+- User typing demands could be reduced by %80.
+- This reduction should significantly reduce repetitive motion injuries.
+- Adapting and optimizing the app for a smartphone environment are the main tasks required for implementation.
