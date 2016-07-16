@@ -24,7 +24,7 @@ if(all(file.exists(paste0(dir, "/test_questions.txt"), paste0(dir, "/test_answer
         texts <- texts[-inds]
         
         # Take 50 phrases as a test set
-        inds <- sample.int(n = length(texts), size = 50)
+        inds <- sample.int(n = length(texts), size = 100)
         texts <- texts[inds]
         
         # Convert the texts into a list

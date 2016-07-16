@@ -13,7 +13,7 @@ library(shiny)
 shinyUI(pageWithSidebar(
         
         # Title
-        headerPanel("Text Completer App"),
+        headerPanel("Text Filling App"),
         
         # Text Entry Field
         sidebarPanel(
@@ -26,7 +26,7 @@ shinyUI(pageWithSidebar(
         
         # Output result.
         mainPanel(
-                h3("This is the guessed word:"),
+                h3("Predicted Word:"),
                 
                 verbatimTextOutput("answer")
         )
