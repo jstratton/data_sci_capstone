@@ -10,11 +10,11 @@
 library(shiny)
 library(data.table)
 
-loc <- "C:/Users/James/data_sci_capstone/kneser_ney_smoothed_2/"
-monograms <- fread(paste0(loc, "KN_monograms.txt"))
-bigrams <- fread(paste0(loc, "KN_bigrams.txt"))
-trigrams <- fread(paste0(loc, "KN_trigrams.txt"))
-tetragrams <- fread(paste0(loc, "KN_tetragrams.txt"))
+loc <- "./data"
+monograms <- fread(paste0(loc, "/KN_monograms.txt"))
+bigrams <- fread(paste0(loc, "/KN_bigrams.txt"))
+trigrams <- fread(paste0(loc, "/KN_trigrams.txt"))
+tetragrams <- fread(paste0(loc, "/KN_tetragrams.txt"))
 
 # Set the smoothing discount for the model
 D = 0.75
