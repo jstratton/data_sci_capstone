@@ -19,13 +19,13 @@ My Approach
 - I used a 3-gram Kneser-Ney model to determine word probabilities.
 - Stupid back off to lower order models was used to handle unobserved histories.
 - If none of the history was observed, the model returns the word observed to complete the most histories.
-- Twitter data was used for training because the app is intended to complete short phrases.
+- Twitter data was used for training because the app is intended for short phrases.
 
 Results
 ========================================================
 
 - The app predicts the user's exact word 15% of the time.
-- However, the app predicts natural continuations 80% of the time.
+- Natural continuations were predicted 80% of the time.
 - Word history tables take up 136.6 MB of memory, or 100 MB when implemented as data tables.
 - For comparison, smartphones have RAM on the order of 2 to 4 GB.
 
