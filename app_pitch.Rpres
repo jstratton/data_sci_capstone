@@ -4,6 +4,8 @@ author: James Stratton
 date: July 16, 2016
 autosize: true
 
+https://github.com/jstratton/data_sci_capstone.git
+
 Introduction
 ========================================================
 
@@ -24,12 +26,12 @@ My Approach
 Results
 ========================================================
 
-- The app predicts the user's exact word 15% of the time.
-- Natural continuations were predicted 80% of the time.
+- Natural continuations are predicted 80% of the time.
+- Exact words are predicted 15% of the time.
 - Word history tables take up 136.6 MB of memory, or 100 MB when implemented as data tables.
-- For comparison, smartphones have RAM on the order of 2 to 4 GB.
+- For comparison, smartphones have about 2 to 4 GB of RAM.
 
-![alt text](file:///C:/Users/James/data_sci_capstone/app_pitch-figure/app_pic.png)
+![alt text](./app_pitch-figure/app_pic.png)
 
 Conclusion
 ===
