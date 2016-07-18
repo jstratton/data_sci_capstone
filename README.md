@@ -5,7 +5,7 @@ This is the repository for my Data Science Specialization Capstone project. The 
 
 Text data was provided by SwiftKey. I chose to use the Twitter posts as my corpus because they are short sentences. This makes it possible to include a lot more entries than the news and blog posts. I assume that most users will only enter short phrases on the smartphones. Twitter posts will be a good match for such data due to their brevity.
 
-I took several steps to clean the data. First, I removed all repeats from the Twitter corpus. Second, I removed all special characters from the Twitter posts. I went and removed most of the characters from different alphabets. This was mainly to prevent my model from predicting symbols such as emojis. I then went and removed all webaddresses from the corpus. Most webaddresses aren't common enough to be worth trying to predict. After that, I went and removed all swear words according to Wiktionary's list. Finally, I added a start of post string "<S> <S> <S> " to the beginning of each post to make it easier to predict words at the start of a sentence.
+I took several steps to clean the data. First, I removed all repeats from the Twitter corpus. Second, I removed all special characters from the Twitter posts. I went and removed most of the characters from different alphabets. This was mainly to prevent my model from predicting symbols such as kanji. I then went and removed all webaddresses from the corpus. Most webaddresses aren't common enough to be worth trying to predict. After that, I went and removed all swear words according to Wiktionary's list. Finally, I added a start of post string "\<S\> \<S\> \<S\> " to the beginning of each post to make it easier to predict words at the start of a sentence.
 
 ## Word Prediction Model
 
@@ -24,6 +24,7 @@ My model achieved an accuracy of ~15% when it attempted to predict the last word
 I decided to manually evaluate the results to see how well the model would perform for its intended purpose. To this end, I compared the model's output with the test input. If the model came up with a natural sounding completion, I marked that as a good result. Otherwise, I would mark it as a bad answer. After carrying out this evaluation, I found that my model came up with valid completions ~80% of the time. To view the results of my evaluation, open test_results.txt or enter the following commands in your R environment:
 
 dir <- "./kneser_ney_smoothed_2"
+
 test_results <- data.table(questions = readLines(con = paste0(dir, "/test_questions.txt"), encoding = "UTF-8"), answers = readLines(con = paste0(dir, "/test_answers.txt"), encoding = "UTF-8"), model_answers = readLines(con = paste0(dir, "/verifier.txt"), encoding = "UTF-8"), good_completion = readLines(con = paste0(dir, "/good_completions.txt"), encoding = "UTF-8"))
 
 ## File Locations
